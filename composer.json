@@ -1,0 +1,24 @@
+{
+	"name": "serato/jwt",
+	"homepage": "https://github.com/serato/web-sws-php-jwt",
+	"description": "JWT handling for Serato Web Services",
+	"type": "metapackage",
+	"require": {
+		"php" : "^7.0",
+		"spomky-labs/jose": "~6.1.0"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "~6.0",
+		"squizlabs/php_codesniffer": "~2.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"Serato\\Jwt\\": "src/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Serato\\Jwt\\Test\\": "tests/"
+		}
+	}
+}
