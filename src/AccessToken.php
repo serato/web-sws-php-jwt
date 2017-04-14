@@ -11,11 +11,11 @@ use Serato\Jwt\Exception\UnhandledTokenCheckException;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
- * Access Token
+ * Serato JWT Access Token
  *
- * A represent of a JWS `access` token.
+ * Implements a JWS `access` token.
  */
-class AccessToken extends AbstractKmsToken
+class AccessToken extends KmsToken
 {
     const TOKEN_CLAIM_SUB = 'access';
     const TOKEN_SIGNING_KEY_ID = 'JWS_ACCESS_COMPACT_HS512';
@@ -44,17 +44,17 @@ class AccessToken extends AbstractKmsToken
      *
      * @todo Specify void return type in PHP 7.1
      *
-     * @param string                    $token   JSON-encoded token payload
-     * @param CacheItemPoolInterface    $cache  PSR-6 cache item pool
+     * @param string                    $tokenString   Base64-encoded JWS token string
+     * @param CacheItemPoolInterface    $cache         PSR-6 cache item pool
      *
      * @throws InvalidSignatureException
      */
-    final public function createFromToken(
-        string $token,
+    final public function parseTokenString(
+        string $tokenString,
         CacheItemPoolInterface $cache = null
     ) {
-        $this->createTokenFromJsonWithKms(
-            $token,
+        $this->parseBase64EncodedTokenDataWithKms(
+            $tokenString,
             self::TOKEN_SIGNING_KEY_ID,
             $cache
         );

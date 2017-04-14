@@ -8,12 +8,12 @@ use Ramsey\Uuid\Uuid;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
- * Abstract KMS Token
+ * Serato JWT KMS Token
  *
  * Provides functionality to allow the use of the AWS KMS service to create
  * and encrypt hashing secrets in JWTs.
  */
-abstract class AbstractKmsToken extends AbstractToken
+abstract class KmsToken extends Token
 {
     const KMS_KEY_SPEC = 'AES_128';
     // The name of the JWT header that stores the client application ID
@@ -62,12 +62,12 @@ abstract class AbstractKmsToken extends AbstractToken
      * @param CacheItemPoolInterface    $psrCache  PSR-6 cache item pool
      * @throws InvalidSignatureException
      */
-    final protected function createTokenFromJsonWithKms(
+    final protected function parseBase64EncodedTokenDataWithKms(
         string $json,
         string $keyId,
         CacheItemPoolInterface $cache = null
     ) {
-        $this->createTokenFromJson($json);
+        $this->parseBase64EncodedTokenData($json);
         $this->verifySignature(
             $keyId,
             $this->getPlaintextEncryptionKey($cache)

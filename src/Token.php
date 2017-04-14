@@ -10,6 +10,8 @@ use Serato\Jwt\Exception\InvalidIssuerClaimException;
 use Serato\Jwt\Exception\InvalidJsonStringException;
 use Serato\Jwt\Exception\CriticalClaimsVerificationException;
 use Serato\Jwt\Exception\UnhandledTokenCheckException;
+use Serato\Jwt\Checker\IssuerChecker;
+use Serato\Jwt\Checker\SubjectChecker;
 use Jose\Factory\JWSFactory;
 use Jose\Factory\JWKFactory;
 use Jose\Object\JWK;
@@ -20,23 +22,24 @@ use Jose\Loader;
 use Jose\Verifier;
 use Jose\Checker\CheckerManager;
 use Jose\Checker\CriticalHeaderChecker;
-use Serato\Jwt\Checker\IssuerChecker;
 use Jose\Checker\ExpirationTimeChecker;
 use Jose\Checker\AudienceChecker;
-use Serato\Jwt\Checker\SubjectChecker;
 use Assert\InvalidArgumentException as AssertInvalidArgumentException;
 
 /**
- * Abstract Token
+ * Serato JWT Token
  *
- * A helper class for creating and validating JSON Web Signatures (JWS).
+ * Base class for creating and validating JSON Web Signatures (JWS).
  *
- * Wraps some functionality around the `spomky-labs/jose` library and encapsulates
- * it entirely within this class should we decide to migrate to a new library.
+ * Encapsualtes functionality provided by the `spomky-labs/jose` library and
+ * encapsulates it entirely within this class.
+ *
+ * All methods that use the underlying `spomky-labs/jose` library are declared as
+ * final and can therefore not be overridden by child classes.
  *
  * See https://github.com/Spomky-Labs/jose for documentation.
  */
-abstract class AbstractToken
+abstract class Token
 {
     /**
      * The value of the `iat` reserved claim within a JWT token
@@ -76,7 +79,7 @@ abstract class AbstractToken
     }
 
     /**
-     * Get a protected header's value from a token
+     * Get a protected header's value from the token
      *
      * @param string $key   Name of header
      *
@@ -108,10 +111,6 @@ abstract class AbstractToken
      */
     final protected function checkClaims(string $aud, string $sub)
     {
-        // For the time, by good fortune, we're only interested in checking the same claims
-        // for both refresh and access tokens.
-        // But if this changes we'll need to devise a mechanism to pass in additional claims.
-
         $checkerManager = new CheckerManager();
         // `crit` header
         $checkerManager->addHeaderChecker(new CriticalHeaderChecker());
@@ -163,15 +162,15 @@ abstract class AbstractToken
      *
      * @todo Specify void return type in PHP 7.1
      *
-     * @param string $json      JSON-encoded token payload
+     * @param string $tokenString    Base64-encoded JWS token string
      *
      * @throws InvalidSignatureException
      */
-    final protected function createTokenFromJson(string $json)
+    final protected function parseBase64EncodedTokenData(string $tokenString)
     {
         $loader = new Loader();
         try {
-            $this->token = $loader->load($json);
+            $this->token = $loader->load($tokenString);
             if (get_class($this->token) !== 'Jose\Object\JWS') {
                 throw new InvalidJsonStringException;
             }
@@ -181,7 +180,7 @@ abstract class AbstractToken
     }
 
     /**
-     * Verify the signature of the self::token instance property
+     * Verify the signature of the token
      *
      * @todo Specify void return type in PHP 7.1
      *
@@ -272,7 +271,7 @@ abstract class AbstractToken
     }
 
     /**
-     * Create a signer object to sign JWS objects with
+     * Create a signer object to sign JWS object with
      *
      * @param string $keyId     Name of signing key
      * @param string $key       Value of signing key
