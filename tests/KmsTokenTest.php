@@ -2,6 +2,8 @@
 namespace Serato\Jwt\Test;
 
 use Aws\Sdk;
+use Aws\Result;
+use Aws\MockHandler;
 use ReflectionClass;
 use PHPUnit\Framework\TestCase;
 use Serato\Jwt\Test\TokenImplementation\KmsToken;
@@ -12,10 +14,11 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter as FileSystemCachePool;
  */
 class KmsTokenTest extends TestCase
 {
+    const MOCK_ENCRYPTION_KEY = '123456789abcdefg';
     const FILE_SYSTEM_CACHE_NAMESPACE = 'tests';
     const TOKEN_AUDIENCE = ['audience1', 'audience2'];
     const TOKEN_SUBJECT = 'my_sub';
-    const TOKEN_KMS_MASTER_KEY = '';
+    const TOKEN_KMS_MASTER_KEY = 'FAKE_MASTER_KEY';
     const TOKEN_CLIENT_APP_ID = 'abcd1234';
     const TOKEN_CLIENT_APP_NAME = 'my_client_app';
     const TOKEN_USER_ID = 123;
@@ -24,7 +27,6 @@ class KmsTokenTest extends TestCase
     const TOKEN_SCOPES = ['scope1', 'scope2'];
 
     protected static $fileSystemCachePool;
-    protected $aws;
 
     protected function setUp()
     {
@@ -66,7 +68,7 @@ class KmsTokenTest extends TestCase
     {
         $token = $this->getMockKmsToken();
 
-        $newToken = new KmsToken($this->getAwsSdk());
+        $newToken = new KmsToken($this->getAwsSdk($this->getMockDecryptResult()));
         $newToken->parseTokenString((string)$token);
         $newToken->validate(self::TOKEN_AUDIENCE[0], self::TOKEN_SUBJECT);
         $newToken->validate(self::TOKEN_AUDIENCE[1], self::TOKEN_SUBJECT);
@@ -95,21 +97,19 @@ class KmsTokenTest extends TestCase
     public function testCreateFromJsonInvalidAudience()
     {
         $token = $this->getMockKmsToken();
-        $newToken = new KmsToken($this->getAwsSdk());
+        $newToken = new KmsToken($this->getAwsSdk($this->getMockDecryptResult()));
         $newToken->parseTokenString((string)$token);
         $newToken->validate(self::TOKEN_AUDIENCE[0] . 'bung value', self::TOKEN_SUBJECT);
     }
 
     /**
-     * @group jwt
-     * @group external-api
-     * @group aws
+     * Test caching functionality
      */
     public function testCreateFromJsonEncryptionKeyCache()
     {
         $token = $this->getMockKmsToken();
 
-        $newToken = new KmsToken($this->getAwsSdk());
+        $newToken = new KmsToken($this->getAwsSdk($this->getMockDecryptResult()));
         $newToken->parseTokenString((string)$token, $this->getFileSystemCachePool());
 
         // Should now have the plaintext encryption key in the cache
@@ -132,13 +132,15 @@ class KmsTokenTest extends TestCase
         // Create the token again from the same string. This time should use
         // the cached encryption key
         // TODO: don't know how to test a cache hit :-(
-        $newToken = new KmsToken($this->getAwsSdk());
+        $newToken = new KmsToken($this->getAwsSdk($this->getMockDecryptResult()));
         $newToken->parseTokenString((string)$token, $this->getFileSystemCachePool());
         $this->assertTrue(true);
     }
 
-    private function getMockKmsToken(int $issuedAt = null, int $expiresAt = null): KmsToken
-    {
+    private function getMockKmsToken(
+        int $issuedAt = null,
+        int $expiresAt = null
+    ): KmsToken {
         if ($issuedAt === null) {
             $issuedAt = time();
         }
@@ -146,7 +148,7 @@ class KmsTokenTest extends TestCase
             $expiresAt = time() + (60 * 60);
         }
 
-        $token = new KmsToken($this->getAwsSdk());
+        $token = new KmsToken($this->getAwsSdk($this->getMockGenerateDataKeyResult()));
         return $token->create(
             self::TOKEN_AUDIENCE, // Audience
             self::TOKEN_SUBJECT, // Subject
@@ -162,17 +164,37 @@ class KmsTokenTest extends TestCase
         );
     }
 
-    protected function getAwsSdk() : Sdk
+    protected function getAwsSdk(Result $result) : Sdk
     {
-        // Credentials are read from ~/.aws/credentials file on dev systems and
-        // via IAM roles on test and production systems
-        if ($this->aws === null) {
-            $this->aws = new Sdk([
-                'region' => 'us-east-1',
-                'version' => '2014-11-01'
-            ]);
-        }
-        return $this->aws;
+        $mock = new MockHandler();
+        $mock->append($result);
+
+        return new Sdk([
+            'region' => 'us-east-1',
+            'version' => '2014-11-01',
+            'credentials' => [
+                'key' => 'my-access-key-id',
+                'secret' => 'my-secret-access-key'
+            ],
+            'handler' => $mock
+        ]);
+    }
+
+    protected function getMockGenerateDataKeyResult(): Result
+    {
+        // Result returned by KmsClient::generateDataKey
+        return new Result([
+            'CiphertextBlob'    => base64_encode(self::MOCK_ENCRYPTION_KEY),
+            'Plaintext'         => self::MOCK_ENCRYPTION_KEY
+        ]);
+    }
+
+    protected function getMockDecryptResult(): Result
+    {
+        // Result returned by KmsClient::decrypt
+        return new Result([
+            'Plaintext' => self::MOCK_ENCRYPTION_KEY
+        ]);
     }
 
     /**
