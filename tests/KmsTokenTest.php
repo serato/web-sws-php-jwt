@@ -220,5 +220,4 @@ class KmsTokenTest extends TestCase
             exec('rm -rf '. escapeshellarg($this->fileSystemCacheDir));
         }
     }
-
 }

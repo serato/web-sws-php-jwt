@@ -9,7 +9,7 @@ Please ensure code adheres to the [PHP-FIG PSR-2 Coding Style Guide](http://www.
 
 Use [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer/wiki) to validate your code against coding standards:
 
-	$ ./vendor/bin/phpcs --standard=SWS-JWT
+	$ ./vendor/bin/phpcs
 
 ## Unit tests
 

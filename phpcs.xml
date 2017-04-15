@@ -1,5 +1,5 @@
-<!-- See https://github.com/squizlabs/PHP_CodeSniffer/wiki/Annotated-ruleset.xml for all options -->
 <?xml version="1.0"?>
+<!-- See https://github.com/squizlabs/PHP_CodeSniffer/wiki/Annotated-ruleset.xml for all options -->
 <ruleset name="SWS-JWT">
     <rule ref="PSR2"/>
     <file>src</file>
