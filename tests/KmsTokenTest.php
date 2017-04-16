@@ -68,7 +68,7 @@ class KmsTokenTest extends TestCase
     {
         $token = $this->getMockKmsToken();
 
-        $newToken = new KmsToken($this->getAwsSdk($this->getMockDecryptResult()));
+        $newToken = new KmsToken($this->getAwsSdk());
         $newToken->parseTokenString((string)$token);
         $newToken->validate(self::TOKEN_AUDIENCE[0], self::TOKEN_SUBJECT);
         $newToken->validate(self::TOKEN_AUDIENCE[1], self::TOKEN_SUBJECT);
@@ -97,7 +97,7 @@ class KmsTokenTest extends TestCase
     public function testCreateFromJsonInvalidAudience()
     {
         $token = $this->getMockKmsToken();
-        $newToken = new KmsToken($this->getAwsSdk($this->getMockDecryptResult()));
+        $newToken = new KmsToken($this->getAwsSdk());
         $newToken->parseTokenString((string)$token);
         $newToken->validate(self::TOKEN_AUDIENCE[0] . 'bung value', self::TOKEN_SUBJECT);
     }
@@ -109,7 +109,7 @@ class KmsTokenTest extends TestCase
     {
         $token = $this->getMockKmsToken();
 
-        $newToken = new KmsToken($this->getAwsSdk($this->getMockDecryptResult()));
+        $newToken = new KmsToken($this->getAwsSdk());
         $newToken->parseTokenString((string)$token, $this->getFileSystemCachePool());
 
         // Should now have the plaintext encryption key in the cache
@@ -132,7 +132,7 @@ class KmsTokenTest extends TestCase
         // Create the token again from the same string. This time should use
         // the cached encryption key
         // TODO: don't know how to test a cache hit :-(
-        $newToken = new KmsToken($this->getAwsSdk($this->getMockDecryptResult()));
+        $newToken = new KmsToken($this->getAwsSdk());
         $newToken->parseTokenString((string)$token, $this->getFileSystemCachePool());
         $this->assertTrue(true);
     }
@@ -148,7 +148,7 @@ class KmsTokenTest extends TestCase
             $expiresAt = time() + (60 * 60);
         }
 
-        $token = new KmsToken($this->getAwsSdk($this->getMockGenerateDataKeyResult()));
+        $token = new KmsToken($this->getAwsSdk());
         return $token->create(
             self::TOKEN_AUDIENCE, // Audience
             self::TOKEN_SUBJECT, // Subject
@@ -164,10 +164,28 @@ class KmsTokenTest extends TestCase
         );
     }
 
-    protected function getAwsSdk(Result $result) : Sdk
+    protected function getAwsSdk() : Sdk
     {
         $mock = new MockHandler();
-        $mock->append($result);
+        
+        // We can "hard code" the MockHandler results queue for all tests because,
+        // within the tests contained within this test case, the KmsToken class
+        // always makes two calls to the KMS service in the same order of execution.
+        
+        // Result returned by KmsClient::generateDataKey
+        $mock->append(
+            new Result([
+                'CiphertextBlob'    => base64_encode(self::MOCK_ENCRYPTION_KEY),
+                'Plaintext'         => self::MOCK_ENCRYPTION_KEY
+            ])
+        );
+
+        // Result returned by KmsClient::decrypt
+        $mock->append(
+            new Result([
+                'Plaintext' => self::MOCK_ENCRYPTION_KEY
+            ])
+        );
 
         return new Sdk([
             'region' => 'us-east-1',
@@ -177,23 +195,6 @@ class KmsTokenTest extends TestCase
                 'secret' => 'my-secret-access-key'
             ],
             'handler' => $mock
-        ]);
-    }
-
-    protected function getMockGenerateDataKeyResult(): Result
-    {
-        // Result returned by KmsClient::generateDataKey
-        return new Result([
-            'CiphertextBlob'    => base64_encode(self::MOCK_ENCRYPTION_KEY),
-            'Plaintext'         => self::MOCK_ENCRYPTION_KEY
-        ]);
-    }
-
-    protected function getMockDecryptResult(): Result
-    {
-        // Result returned by KmsClient::decrypt
-        return new Result([
-            'Plaintext' => self::MOCK_ENCRYPTION_KEY
         ]);
     }
 
