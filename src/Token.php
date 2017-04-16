@@ -27,24 +27,18 @@ use Jose\Checker\AudienceChecker;
 use Assert\InvalidArgumentException as AssertInvalidArgumentException;
 
 /**
- * Serato JWT Token
- *
  * Base class for creating and validating JSON Web Signatures (JWS).
- *
- * Encapsualtes functionality provided by the `spomky-labs/jose` library and
- * encapsulates it entirely within this class.
- *
- * All methods that use the underlying `spomky-labs/jose` library are declared as
- * final and can therefore not be overridden by child classes.
- *
- * See https://github.com/Spomky-Labs/jose for documentation.
  */
 abstract class Token
 {
     /**
-     * The value of the `iat` reserved claim within a JWT token
+     * The value of the `iat` reserved claim within the JWT token
      */
     const ISSUED_BY = 'id.serato.io';
+    
+    /**
+     * The algorithm used to generate the JWS signature
+     */
     const SIGNER_ALG = 'HS512';
 
     /**
@@ -54,6 +48,11 @@ abstract class Token
      */
     private $token;
 
+    /**
+     * Get the compact JSON notation form of the token
+     *
+     * @return string
+     */
     final public function __toString(): string
     {
         if (!is_null($this->token)) {
@@ -95,12 +94,14 @@ abstract class Token
     }
 
     /**
-     * Check the presence and validity of the claims within a token
+     * Check the validity of the claims within a token
      *
      * @todo Specify void return type in PHP 7.1
      *
      * @param string    $aud    Expected value of `aud` claim
      * @param string    $sub    Expected value of `sub` claim
+     *
+     * @return void
      *
      * @throws TokenExpiredException
      * @throws InvalidAudienceClaimException
@@ -157,12 +158,13 @@ abstract class Token
     }
 
     /**
-     * Create the self::token instance property from a JSON string and verify
-     * the token's signature
+     * Parse a JSON compact notation string and verfiy the provided signature
      *
      * @todo Specify void return type in PHP 7.1
      *
      * @param string $tokenString    Base64-encoded JWS token string
+     *
+     * @return void
      *
      * @throws InvalidSignatureException
      */
@@ -187,6 +189,8 @@ abstract class Token
      * @param string    $keyId      Name of signing key
      * @param string    $key        Value of signing key
      *
+     * @return void
+     *
      * @throws InvalidSignatureException
      */
     final protected function verifySignature(string $keyId, string $key)
@@ -204,7 +208,7 @@ abstract class Token
     }
 
     /**
-     * Create a JWS object and set it the self::token instance property
+     * Construct a JWS token
      *
      * @todo Specify void return type in PHP 7.1
      *
@@ -278,7 +282,7 @@ abstract class Token
      *
      * @return JWK
      */
-    final protected function getSigner(string $keyId, string $key): JWK
+    private function getSigner(string $keyId, string $key): JWK
     {
         return JWKFactory::createFromValues(
             [
