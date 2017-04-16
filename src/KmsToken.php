@@ -171,7 +171,6 @@ abstract class KmsToken extends Token
      *
      * @return void
      */
-
     final protected function createTokenWithKms(
         string $clientAppKmsMasterKeyId,
         string $clientAppId,

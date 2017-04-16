@@ -212,14 +212,14 @@ abstract class Token
      *
      * @todo Specify void return type in PHP 7.1
      *
-     * @param array     $audience       JWT `aud` claim
-     * @param string    $subject        JWT `sub` claim
-     * @param int       $issuedAtTime   JWT `iat` claim
-     * @param int       $expiresAtTime  JWT `exp` claim
-     * @param array     $customClaims   Custom JWT claims
-     * @param array     $customHeaders  Custom JWT headers
-     * @param string    $signingKeyId   Name of signing key
-     * @param string    $signingKey     Value of signing key
+     * @param array     $audience           JWT `aud` claim
+     * @param string    $subject            JWT `sub` claim
+     * @param int       $issuedAtTime       JWT `iat` claim
+     * @param int       $expiresAtTime      JWT `exp` claim
+     * @param array     $customClaims       Custom JWT claims
+     * @param array     $customHeaders      Custom JWT headers
+     * @param string    $signingKeyId       Name of signing key
+     * @param string    $signingKey         Value of signing key
      *
      * @return void
      */
