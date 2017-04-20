@@ -1,4 +1,4 @@
-# Serato Web Services PHP JWT
+# Serato Web Services PHP JWT [![Build Status](https://img.shields.io/travis/serato/web-sws-php-jwt.svg)](https://travis-ci.org/serato/web-sws-php-jwt)
 
 [![Latest Stable Version](https://img.shields.io/packagist/v/serato/jwt.svg)](https://packagist.org/packages/serato/jwt)
 
