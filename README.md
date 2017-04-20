@@ -1,5 +1,7 @@
 # Serato Web Services PHP JWT
 
+[![Latest Stable Version](https://img.shields.io/packagist/v/serato/jwt.svg)](https://packagist.org/packages/serato/jwt)
+
 A PHP library containing common functionality for working with JWTs witin
 Serato Web Services web applications.
 
