@@ -41,7 +41,7 @@ Configuration for PHPUnit is defined within [phpunit.xml](phpunit.xml).
 To run tests:
 
 ```bash
-$ php vendor/bin/phpunit -c phpunit.xml
+$ php vendor/bin/phpunit
 ```
 
 See [PHPUnit documentation](https://phpunit.de/manual/current/en/index.html) for more options.
@@ -62,3 +62,14 @@ Note: Must be run on PHP 7.* system.
 Documentation is generated into the `docs\php` directory.
 
 Configuration for Sami is contained within [phpdoc.php](phpdoc.php).
+
+## Generate code coverage report
+
+If you have [phpdbg](http://phpdbg.com/) installed you can generate a code coverage report with phpunit:
+
+```bash
+$ phpdbg -qrr ./vendor/bin/phpunit --coverage-html tests/reports/coverage
+```
+
+Reports are generated in the `tests/reports` directory.
+

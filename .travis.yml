@@ -1,15 +1,36 @@
 language: php
-
 php:
-  - 7.0
-  - 7.1
-
+- 7.0
+- 7.1
 cache:
   directories:
-    - $HOME/.composer/cache
+  - "$HOME/.composer/cache"
+env:
+  # ARTIFACTS_KEY
+  secure: "tTbRTU/1/IcytwmVn1gpuoQ6XFlSf+TYITA13CA0PQ2bT/IVAJYOlIDe5oy3o4wHU73qS9EqSHu0B2x9A2eXMw8XjYZ5l5ZqjVTjg2hOK6pbxaQjWUWUTa7B4x1V0tLnpS1bUagE0bqMJCRmef3M1LKFdvvzM0CAzKdMBQGwXTtnv4mDCMyCQuvadWmsK7shPz2SR0gUGGs2z1LmbL8s51nYPKNhuaaVMQNYVqkFAdy9rr2VdwxJN0V6oGQVq1FcSW5sUBw8w30XSBIeR7xNa3yh5LbmwbI0w0ZeazcfRwkz4SOife9Sml4jDL1ZDeYlkxR1UI9TfyEmiNp9N72PxM0TJbhq8Gy7noZBilg/SbssFrZSuPfEbEx1IkUgSqNqSRja9KVo5gNnvc+wcAtwA1GjdGedxcqsQqTiQT3YatJQppsYjoFjgwHwCG+L+212Q32Ye+zdMYKIHBQP0BQ+ZJKqGW6bpPykgIWNWoIkv3Qp7WcLWCVGEap1/4fdl/r+2M1pp+8/hVZ93ndeCuXu6O/A7e78uJjhtO3TCLerJJiafvZdYwSHr7q1A9EKgqF/hmkkMaK62X8vnO3BCt1I0oOYLW/144uGVu27wys5UwqRGqRSpRKgRDjvL00yb92WfTbfBpwIt4SRY6oZkaKMoaSD+9MdaY8rnT27dyM78Ao="
+  # ARTIFACTS_SECRET
+  secure: "mvFBdqr7vmOuaC4v2rjUArLpV7d5b113ZJ0N9Rd9BVi+r24fnJy78t9UpVr6w8RlHS/yhxjzcNw6GQcDcCfmBsDyQZRpoYphHgg7YjIWCyyXc1HSmtYbLpC9AoBIWR3C7ANg2v8Belg2mKjohcwubqHURGq/L81JvjVIEYqJNgNAwysBVsAt7840fFjh59kEGDhlXEpJ4NKy1+TYyZD9T4sdgVjz7360mP25IIcIW8dTNtuKMe1zKa/J+zjyPwJX6mAl/u6/1d3nFL1qRr/VA9aY6si5BY1UC57bWFbH0lWE0oiBFdP2go8tnsk02MuXm1g1LHdZojpPVH8dDh1sdHcWSnY+D7zhOXrHl8vBUR3vyLXt3ToBh7i+3vr7BjtP6v+/ixHQKwzoag2k6t9ivUHL70bU6GPcAD6kk89vUNXKfCLl4+J9EwS7znwl8ZLUPxE7Nb9IimHzW1F2gFyOHz3ImBjKvLRVVi+KXc+YBdVNK3TJ/pbW9gTj1XYX0/fmEWjx338tuafrSvSXS2Qxm3/1rxu82kxiUifWcm2cQeRX4m93mv4dTb2MM35f8MMgIybb0NUU3OLRp7iicvlofx7vnWZ4gOMamH6pfbF5YCbqXyVSDW/sZqjjeQbJrtEgOe6sgqi5nSt/y8rpoKCj7lzIqbfev9pzch9eCNKMt8c="
+  # ARTIFACTS_BUCKET
+  secure: "vQsFe0LPH017FkzZ9VvfxupU/CKSUI7GkEFi5eCcZC1R1jODfP3LH7pRQKBTFWhxXzddGHllMcZ3N9aP1JmDQcQTKYVFy6Wu29hputUlwmST9k6DCBgj3gHiUkUz8olFDdspDEL7v3DI+IQSYGJHt9o7TmHuhzJCB/xSNkZQMW7aHOGDDdERiBWedV3akY2tUXDGnoFudpm84PujYm4wCP/YK8rJis5Ph8qkVizoSonyUXoz/57tT7A8etPekYmgbM3OPhxks7tSbLnVvUHI6wLf/QN4DkEjhOWX0yY5dRRYFmWkLcNdMO78SS76D7Bglb09KcNrOkSv3RTQPRbo5kEWS54qCEi11O7hOWuxiXKVzTTPqXO6aTn/QmzP9Z5Z/GHo4nj1xjTWGh1xp3PPKerfrXmR+1c2O0saxxM5rR2gljdSTEHDL8I8nxZCxUsaal8ldsZsDIq/JImcgRCwLOmKYV7AD0DQOLq8dRzC+QKI/Kq72iM1jtAFxyrJfRibrLJIxZuKibuEAtv+XYInaBNyLCCBVWFXjMH4HhXc5MkUUh9bgqeugQu3iUHK4+2aIG+CKuH6U5SZxAwruwqs3vx4cW9ZOZTLli/C+w2R5k053ViQ+cvaLtOkUsHB1IqcHbaaSske+q+ziWR9MZTYu3ZpKFNgjYMzdMZayhyFmgc="
+
+branches:
+  only:
+  - master
 
 install: composer install
 
+before_script:
+- phpenv config-rm xdebug.ini
+
 script:
-  - php vendor/bin/phpunit -c phpunit.xml
-  - ./vendor/bin/phpcs
+- php vendor/bin/phpunit -c phpunit.xml
+- "./vendor/bin/phpcs"
+
+after_success:
+- php sami.phar update phpdoc.php
+
+addons:
+  artifacts:
+    paths:
+    - ./docs/php
+    debug: true
