@@ -14,6 +14,7 @@ env:
 branches:
   only:
     - master
+    - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
 
 before_install:
   - phpenv config-rm xdebug.ini
@@ -31,6 +32,6 @@ addons:
   artifacts:
     debug: true
     s3_region: us-east-1
-    target_paths: $TRAVIS_BRANCH
+    target_paths: "$TRAVIS_REPO_SLUG/$TRAVIS_BRANCH"
     paths:
       - ./docs/php
