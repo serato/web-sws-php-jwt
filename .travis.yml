@@ -1,31 +1,35 @@
 language: php
+
 php:
-- 7.0
-- 7.1
+  - 7.0
+  - 7.1
+
 cache:
   directories:
-  - "$HOME/.composer/cache"
+    - "$HOME/.composer/cache"
+
 env:
   secure: "cmfyAaUCC1qEAwtHTsInnqWIQQjJGoAH9/jSZnzKgOWL2miJDYi8Oa5GuS0VTHgXU19TU/oRYSqT9DH0+khC+EtIOS4fUKNbT4CvW8vlWg+9NG+8VrJIzqf/TAZ3LtZaWjka8UFV6UMlAhqxf7OMBbbMkrDu704b8oMtKa1dub9t73YXW+WH+svczJiW5/mUUGRfZHUO3BmGEjgt91fMk2TLW+kA1oebwI8ZPQjABq+1ElL9bM3dRhuaZ5MCjeblpzvz+CFLhil4QHHp8Qw9PIRDAW3C0flpCjzU55xhoDmXj4TJPvBl55ia3PEfIZ4WlSS0TO0BKdinYrXdW8n2bW5faIN00PyZ4l4reBarS5dux6mrEUYzlrtfAErRVj0zyzXs+JDKHmU/0Mjr71oRazayFSjER4GmWKU+E8Mg0f+gLnYCXIBIEQ2o+JEh1YuM9GURtyHf2NLnr4mHqZbNlPtAyDM3PHgoja5UaVB976YYVzJ+VnQDK4Lv0FZ0ndqxpLrwhR7auWv3873eh3/spsSNbr2xYecjCaXQSzmb1gDxfnxzkfFSoqvPNpl2bkHT+PyVziItsVovRttm/yxrOay47GUBRIBC1q6E/j7tv7pYuU7fvTy8CNrElLwkfmyatCMQBuqejS+igwUDOh8ReTe9ryXXfsJBsAxaDNtpfN4="
 
 branches:
   only:
-  - master
+    - master
 
 before_install:
-- phpenv config-rm xdebug.ini
+  - phpenv config-rm xdebug.ini
 
 install: composer install
 
 script:
-- php vendor/bin/phpunit -c phpunit.xml
-- "./vendor/bin/phpcs"
+  - php vendor/bin/phpunit -c phpunit.xml
+  - "./vendor/bin/phpcs"
 
 after_success:
-- php sami.phar update phpdoc.php
+  - php sami.phar update phpdoc.php
 
 addons:
   artifacts:
-    paths:
-    - ./docs/php
     debug: true
+    s3_region: us-east-1
+    paths:
+      - ./docs/php
