@@ -31,6 +31,6 @@ addons:
   artifacts:
     debug: true
     s3_region: us-east-1
-    target_paths: $TRAVIS_TAG
+    target_paths: $TRAVIS_BRANCH
     paths:
       - ./docs/php
