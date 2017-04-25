@@ -2,7 +2,7 @@
 	"name": "serato/jwt",
 	"homepage": "https://github.com/serato/web-sws-php-jwt",
 	"description": "JWT handling for Serato Web Services",
-	"type": "metapackage",
+	"type": "library",
 	"require": {
 		"php" : "^7.0",
 		"spomky-labs/jose": "~6.1.0",
