@@ -57,7 +57,7 @@ abstract class KmsToken extends Token
      *
      * @return Sdk
      */
-    private function getAws(): Sdk
+    public function getAws(): Sdk
     {
         return $this->aws;
     }
