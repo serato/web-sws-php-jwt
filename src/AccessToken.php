@@ -21,7 +21,7 @@ class AccessToken extends KmsToken
     const TOKEN_SIGNING_KEY_ID = 'JWS_ACCESS_COMPACT_HS512';
 
     /**
-     * Check the presence and validity of the claims within a refresh token
+     * Check the presence and validity of the claims within an access token
      *
      * @todo Specify void return type in PHP 7.1
      *
