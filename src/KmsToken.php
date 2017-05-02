@@ -71,7 +71,7 @@ abstract class KmsToken extends Token
      *
      * @param string                    $json      JSON-encoded token payload
      * @param string                    $keyId     Name of signing key
-     * @param CacheItemPoolInterface    $psrCache  PSR-6 cache item pool
+     * @param CacheItemPoolInterface    $cache     PSR-6 cache item pool
      *
      * @return void
      *
