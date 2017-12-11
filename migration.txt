@@ -1,0 +1,28 @@
+- ID service will need to extend Serato\Jwt\AccessToken and implement AccessToken::create method
+- ID service will need to implement RefreshToken (and tests)
+
+Serato\Jwt\AbstractToken -> renamed
+Serato\Jwt\Token
+- Method createTokenFromJson renamed to parseBase64EncodedTokenData
+
+Serato\Jwt\AbstractKmsToken -> renamed
+Serato\Jwt\KmsToken
+- Method createTokenFromJsonWithKms renamed to parseBase64EncodedTokenDataWithKms
+
+
+License Service
+Serato\Jwt\AccessToken
+- Method createFromToken / createFromJson renamed to parseTokenString
+
+
+
+All exception classes have a new namespace too :-)
+
+Is there a better method name than AccessToken::create and RefreshToken::create??
+
+Implement full KMS JWT integration tests in web apps
+
+
+
+Full README
+Full PHP doc
