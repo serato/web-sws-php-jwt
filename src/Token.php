@@ -130,6 +130,7 @@ abstract class Token
             switch ((int)$e->getCode()) {
                 // `exp`
                 case 212:
+                case 213:
                     throw new TokenExpiredException;
                     break;
                 // `aud`
