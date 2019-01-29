@@ -13,7 +13,9 @@
 		"phpunit/phpunit": "~6.0",
 		"squizlabs/php_codesniffer": "~2.0",
 		"symfony/cache": "v3.4.0",
-		"phpstan/phpstan": "^0.11.0"
+		"phpstan/phpstan": "^0.11.0",
+		"apigen/apigen": "dev-master#85290e8",
+		"roave/better-reflection": "dev-master#ce9d784"
 	},
 	"autoload": {
 		"psr-4": {
