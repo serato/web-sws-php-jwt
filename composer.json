@@ -4,7 +4,7 @@
 	"description": "JWT handling for Serato Web Services",
 	"type": "library",
 	"require": {
-		"php" : "^7.0",
+		"php" : "^7.1",
 		"spomky-labs/jose": "~7.0.0",
 		"aws/aws-sdk-php": "~3.0",
 		"ramsey/uuid": "~3.6"
