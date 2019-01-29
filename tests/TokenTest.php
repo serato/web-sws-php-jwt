@@ -37,11 +37,13 @@ class TokenTest extends TestCase
         $token->create();
 
         $tokenParts = explode('.', (string)$token);
-        $payload = json_decode(base64_decode($tokenParts[1]), true);
+        $jsonString = base64_decode($tokenParts[1]);
+        $payload = json_decode($jsonString === false ? '' : $jsonString, true);
         $payload['var1'] = 'fiddled_with';
 
+        $jsonString = json_encode($payload);
         $jsonData = $tokenParts[0] . '.' .
-            Base64Url::encode(json_encode($payload)) . '.' .
+            Base64Url::encode($jsonString === false ? '' : $jsonString) . '.' .
             $tokenParts[2];
         
         $newToken = new Token();
@@ -61,11 +63,14 @@ class TokenTest extends TestCase
         $token->create();
 
         $tokenParts = explode('.', (string)$token);
-        $payload = json_decode(base64_decode($tokenParts[1]), true);
+
+        $jsonString = base64_decode($tokenParts[1]);
+        $payload = json_decode($jsonString === false ? '' : $jsonString, true);
         $payload['var1'] = 'fiddled_with';
 
+        $jsonString = json_encode($payload);
         $jsonData = $tokenParts[0] . '.' .
-            Base64Url::encode(json_encode($payload)) . '.' .
+            Base64Url::encode($jsonString === false ? '' : $jsonString) . '.' .
             $tokenParts[2];
         
         $newToken = new Token();

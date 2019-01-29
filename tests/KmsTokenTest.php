@@ -23,9 +23,10 @@ class KmsTokenTest extends TestCase
     const TOKEN_CLIENT_APP_NAME = 'my_client_app';
     const TOKEN_USER_ID = 123;
     const TOKEN_USER_EMAIL = 'test@test.com';
-    const TOKEN_EMAIL_VERIFIED = 1;
+    const TOKEN_EMAIL_VERIFIED = true;
     const TOKEN_SCOPES = ['scope1', 'scope2'];
 
+    private $fileSystemCacheDir;
     protected static $fileSystemCachePool;
 
     protected function setUp()

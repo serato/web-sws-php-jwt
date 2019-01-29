@@ -16,7 +16,7 @@ before_install:
 - phpenv config-rm xdebug.ini
 install: composer install
 script:
-- "./vendor/bin/phpstan analyse src --level 7"
+- "./vendor/bin/phpstan analyse src tests --level 7"
 - php vendor/bin/phpunit -c phpunit.xml
 - "./vendor/bin/phpcs"
 after_success:
