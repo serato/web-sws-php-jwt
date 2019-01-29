@@ -22,7 +22,7 @@ available versions.
 
 ## Requirements
 
-This library requires PHP 7.0 or above.
+This library requires PHP 7.1 or above.
 
 ## Style guide
 
@@ -32,6 +32,14 @@ Use [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer/wiki) to vali
 
 ```bash
 $ ./vendor/bin/phpcs
+```
+
+## PHPStan
+
+Use PHPStan for static code analysis:
+
+```bash
+$ vendor/bin/phpstan analyse src tests --level 7
 ```
 
 ## Unit tests
@@ -56,8 +64,6 @@ To generate documentation:
 ```bash
 $ php sami.phar update phpdoc.php
 ```
-
-Note: Must be run on PHP 7.* system.
 
 Documentation is generated into the `docs\php` directory.
 
