@@ -6,6 +6,7 @@ use Aws\Result;
 use DateTime;
 use Ramsey\Uuid\Uuid;
 use Psr\Cache\CacheItemPoolInterface;
+use Serato\Jwt\Exception\InvalidSignatureException;
 
 /**
  * Provides functionality to allow the use of the AWS KMS service to create
@@ -94,7 +95,7 @@ abstract class KmsToken extends Token
      * can be provided to minimise round trips to KMS to decrypt the plaintext key
      * from the key cipher text.
      *
-     * @param CacheItemPoolInterface    $psrCache   PSR-6 cache item pool
+     * @param CacheItemPoolInterface    $cache   PSR-6 cache item pool
      *
      * @return string
      */
@@ -200,7 +201,7 @@ abstract class KmsToken extends Token
      * Create an array of token headers that store the encrypted key data
      *
      * @param string        $clientAppId    Client Application ID
-     * @param string        $ciphertextBlob         The encrypted data encryption key
+     * @param string        $ciphertext     The encrypted data encryption key
      * @returns array
      */
     private function getTokenKeyHeaders(string $clientAppId, string $ciphertext): array

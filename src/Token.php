@@ -17,6 +17,7 @@ use Jose\Factory\JWKFactory;
 use Jose\Object\JWK;
 use Jose\Object\JWS;
 use Jose\Object\JWKSet;
+use Jose\Object\JWKInterface;
 use Jose\Signer;
 use Jose\Loader;
 use Jose\Verifier;
@@ -25,6 +26,7 @@ use Jose\Checker\CriticalHeaderChecker;
 use Jose\Checker\ExpirationTimeChecker;
 use Jose\Checker\AudienceChecker;
 use Assert\InvalidArgumentException as AssertInvalidArgumentException;
+use Exception;
 
 /**
  * Base class for creating and validating JSON Web Signatures (JWS).
@@ -55,11 +57,7 @@ abstract class Token
      */
     final public function __toString(): string
     {
-        if (!is_null($this->token)) {
-            // Call Jose\Object\JWS::toCompactJSON
-            return $this->token->toCompactJSON(0);
-        }
-        return '';
+        return $this->token->toCompactJSON(0);
     }
 
     /**
@@ -71,10 +69,7 @@ abstract class Token
      */
     final public function getClaim(string $key)
     {
-        if (!is_null($this->token)) {
-            return $this->token->getClaim($key);
-        }
-        return null;
+        return $this->token->getClaim($key);
     }
 
     /**
@@ -86,11 +81,8 @@ abstract class Token
      */
     final public function getProtectedHeader(string $key)
     {
-        if (!is_null($this->token)) {
-            $sig = $this->token->getSignatures();
-            return $sig[0]->getProtectedHeader($key);
-        }
-        return null;
+        $sig = $this->token->getSignatures();
+        return $sig[0]->getProtectedHeader($key);
     }
 
     /**
@@ -173,10 +165,11 @@ abstract class Token
     {
         $loader = new Loader();
         try {
-            $this->token = $loader->load($tokenString);
-            if (get_class($this->token) !== 'Jose\Object\JWS') {
+            $token = $loader->load($tokenString);
+            if (!is_a($token, '\Jose\Object\JWS')) {
                 throw new InvalidJsonStringException;
             }
+            $this->token = $token;
         } catch (InvalidArgumentException $e) {
             throw new InvalidJsonStringException;
         }
@@ -285,7 +278,7 @@ abstract class Token
      */
     private function getSigner(string $keyId, string $key): JWK
     {
-        return JWKFactory::createFromValues(
+        $jwt = JWKFactory::createFromValues(
             [
                 'alg' => self::SIGNER_ALG,
                 'kty' => 'oct',
@@ -294,5 +287,15 @@ abstract class Token
                 'k'   => $key,
             ]
         );
+        # JWKFactory::createFromValues can return either a `Jose\Object\JWK` or `Jose\Object\JWKSet` depending
+        # on the argument array.
+        # In our usage it always returns a `Jose\Object\JWK`.
+        # This type check is added so that phpstan is happy with the return value of this function, but in practice
+        # the Exception will never be thrown because of how we construct the argument array for the
+        # JWKFactory::createFromValues method call.
+        if (!is_a($jwt, '\Jose\Object\JWK')) {
+            throw new Exception('Error');
+        }
+        return $jwt;
     }
 }
