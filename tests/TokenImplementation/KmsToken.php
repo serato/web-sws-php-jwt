@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Serato\Jwt\Test\TokenImplementation;
 
 use Serato\Jwt\KmsToken as JwtKmsToken;

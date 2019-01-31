@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Serato\Jwt\Test;
 
 use Serato\Jwt\Test\TokenImplementation\Token;
