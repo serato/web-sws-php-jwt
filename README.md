@@ -39,7 +39,7 @@ $ ./vendor/bin/phpcs
 Use PHPStan for static code analysis:
 
 ```bash
-$ vendor/bin/phpstan analyse src tests --level 7
+$ vendor/bin/phpstan analyse
 ```
 
 ## Unit tests
