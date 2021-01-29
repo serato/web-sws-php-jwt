@@ -18,6 +18,7 @@ script:
 - "./vendor/bin/phpstan analyse"
 - php vendor/bin/phpunit -c phpunit.xml
 - "./vendor/bin/phpcs"
+- "./vendor/bin/security-checker security:check"
 after_success:
 - "./vendor/bin/apigen generate src --destination docs"
 addons:
