@@ -271,6 +271,54 @@ abstract class Token
     }
 
     /**
+     * Gets a cache key for the given refresh token ID
+     *
+     * @param string $refreshTokenId Refresh token ID
+     * @return string
+     */
+    protected static function getRefreshTokenIdCacheKey(string $refreshTokenId): string
+    {
+        return 'r-' .  $refreshTokenId;
+    }
+
+    /**
+     * Writes a refresh token ID into the given memcache connection with a time to live value.
+     * The refresh token is considered invalidated when placed into memcache.
+     *
+     * @param \Memcached $memcache Memcache connection
+     * @param string $refreshTokenId Refresh token ID
+     * @param integer $ttl Expiry time in seconds
+     * @return boolean
+     */
+    public static function setInvalidRefreshTokenIdCacheItem(
+        \Memcached $memcache,
+        string $refreshTokenId,
+        int $ttl
+    ): bool {
+    
+        return $memcache->add(self::getRefreshTokenIdCacheKey($refreshTokenId), $refreshTokenId, $ttl);
+    }
+
+    /**
+     * Reads an invalidated refresh token ID from the given memcached connection. Returns null if it doesn't exist.
+     *
+     * @param \Memcached $memcache Memcache connection
+     * @param string $refreshTokenId Refresh token ID
+     * @return string|null
+     */
+    public static function getInvalidRefreshTokenIdCacheItem(
+        \Memcached $memcache,
+        string $refreshTokenId
+    ): ?string {
+    
+        $cacheItem = $memcache->get(self::getRefreshTokenIdCacheKey($refreshTokenId));
+        if ($cacheItem === false) {
+            return null;
+        }
+        return $cacheItem;
+    }
+
+    /**
      * Create a signer object to sign JWS object with
      *
      * @param string $keyId     Name of signing key

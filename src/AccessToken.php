@@ -21,6 +21,7 @@ class AccessToken extends KmsToken
 {
     const TOKEN_CLAIM_SUB = 'access';
     const TOKEN_SIGNING_KEY_ID = 'JWS_ACCESS_COMPACT_HS512';
+    const REFRESH_TOKEN_ID_CLAIM = 'rtid';
 
     /**
      * Check the presence and validity of the claims within an access token
@@ -28,6 +29,7 @@ class AccessToken extends KmsToken
      * @todo Specify void return type in PHP 7.1
      *
      * @param string    $webServiceUri     The URI of the validating web service
+     * @param \Memcached $memcache Memcache connection
      *
      * @throws TokenExpiredException
      * @throws InvalidAudienceClaimException
@@ -36,9 +38,14 @@ class AccessToken extends KmsToken
      * @throws CriticalClaimsVerificationException
      * @throws UnhandledTokenCheckException
      */
-    final public function validate(string $webServiceUri)
+    final public function validate(string $webServiceUri, \Memcached $memcache)
     {
         $this->checkClaims($webServiceUri, self::TOKEN_CLAIM_SUB);
+        $rtid = $this->getClaim(self::REFRESH_TOKEN_ID_CLAIM);
+        if (self::getInvalidRefreshTokenIdCacheItem($memcache, $rtid) !== null) {
+            // If the parent refresh token ID has been invalidated, treat this access token as expired.
+            throw new TokenExpiredException;
+        }
     }
 
      /**
