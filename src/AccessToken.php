@@ -41,8 +41,15 @@ class AccessToken extends KmsToken
     final public function validate(string $webServiceUri, \Memcached $memcache)
     {
         $this->checkClaims($webServiceUri, self::TOKEN_CLAIM_SUB);
-        $rtid = $this->getClaim(self::REFRESH_TOKEN_ID_CLAIM);
-        if (self::getInvalidRefreshTokenIdCacheItem($memcache, $rtid) !== null) {
+        $rtid = '';
+        try {
+            $rtid = $this->getClaim(self::REFRESH_TOKEN_ID_CLAIM);
+        } catch (\InvalidArgumentException $e) {
+            // The access token does not have an rtid. In this case we will simply skip
+            // the following validation step
+        }
+
+        if ($rtid !== '' && self::getInvalidRefreshTokenIdCacheItem($memcache, $rtid) !== null) {
             // If the parent refresh token ID has been invalidated, treat this access token as expired.
             throw new TokenExpiredException;
         }
