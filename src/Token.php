@@ -334,7 +334,7 @@ abstract class Token
                 'kty' => 'oct',
                 'kid' => $keyId,
                 'use' => 'sig',
-                'k'   => $key,
+                'k'   => base64_encode($key),
             ]
         );
         # JWKFactory::createFromValues can return either a `Jose\Object\JWK` or `Jose\Object\JWKSet` depending
