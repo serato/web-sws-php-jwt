@@ -5,7 +5,8 @@ namespace Serato\Jwt;
 
 use Aws\Sdk as AwsSdk;
 
-interface IToken {
+interface IToken
+{
     /**
      * Get the AWS client
      *
@@ -64,5 +65,4 @@ interface IToken {
         \Memcached $memcache,
         string $refreshTokenId
     ): ?string;
-
 }

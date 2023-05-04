@@ -14,7 +14,6 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter as FileSystemCachePool;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-
 /**
  * Unit and integration tests for App\Jwt\AccessToken
  */

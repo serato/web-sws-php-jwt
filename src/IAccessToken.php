@@ -10,10 +10,11 @@ use Serato\Jwt\Exception\InvalidIssuerClaimException;
 use Serato\Jwt\Exception\CriticalClaimsVerificationException;
 use Serato\Jwt\Exception\UnhandledTokenCheckException;
 
-interface IAccessToken extends IToken {
+interface IAccessToken extends IToken
+{
     /**
      * Creates a JWS access token
-     * 
+     *
      * @param string $appId             Client application ID
      * @param string $appName           Client application name
      * @param int $expirySeconds        Token expiry time in seconds

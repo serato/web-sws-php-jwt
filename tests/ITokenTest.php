@@ -50,7 +50,10 @@ abstract class ITokenTest extends TestCase
         $this->assertEquals($token->getClaim('aud'), self::CLIENT_APP_ACCESS_TOKEN_DEFAULT_AUDIENCE);
         $this->assertEquals($token->getClaim('iss'), 'id.serato.io');
         $this->assertEquals($token->getClaim('sub'), 'access');
-        $this->assertEquals($token->getClaim('exp'), $token->getClaim('iat') + self::CLIENT_APP_ACCESS_TOKEN_EXPIRY_SECONDS);
+        $this->assertEquals(
+            $token->getClaim('exp'),
+            $token->getClaim('iat') + self::CLIENT_APP_ACCESS_TOKEN_EXPIRY_SECONDS
+        );
         // Serato-specific claims
         $this->assertEquals($token->getClaim('app_id'), self::CLIENT_APP_ID);
         $this->assertEquals($token->getClaim('app_name'), self::CLIENT_APP_NAME);

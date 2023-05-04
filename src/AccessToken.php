@@ -32,8 +32,7 @@ class AccessToken extends KmsToken implements IAccessToken
         array $scopes,
         string $refreshTokenId,
         int $issuedAt = null
-    ): IAccessToken
-    {
+    ): IAccessToken {
         if ($issuedAt === null) {
             $issuedAt = time();
         }

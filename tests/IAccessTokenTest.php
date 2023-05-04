@@ -11,7 +11,7 @@ use Mockery;
 abstract class IAccessTokenTest extends ITokenTest
 {
     /**
-     * @expectedException \Serato\Jwt\Exception\TokenExpiredException   
+     * @expectedException \Serato\Jwt\Exception\TokenExpiredException
      */
     public function testExpiredIssuedAt(): void
     {

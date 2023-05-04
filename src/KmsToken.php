@@ -33,6 +33,7 @@ use Jose\Checker\ExpirationTimeChecker;
 use Jose\Checker\AudienceChecker;
 use Assert\InvalidArgumentException as AssertInvalidArgumentException;
 use Exception;
+
 /**
  * Provides functionality to allow the use of the AWS KMS service to create
  * and encrypt hashing secrets in JWTs.
