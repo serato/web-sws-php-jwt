@@ -11,12 +11,17 @@ use ReflectionClass;
 use PHPUnit\Framework\TestCase;
 use Serato\Jwt\Test\TokenImplementation\KmsToken;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter as FileSystemCachePool;
+use Mockery;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+
 
 /**
  * Unit and integration tests for App\Jwt\AccessToken
  */
 class KmsTokenTest extends TestCase
 {
+    use MockeryPHPUnitIntegration;
+
     const MOCK_ENCRYPTION_KEY = '123456789abcdefg';
     const FILE_SYSTEM_CACHE_NAMESPACE = 'tests';
     const TOKEN_AUDIENCE = ['audience1', 'audience2'];
@@ -218,8 +223,6 @@ class KmsTokenTest extends TestCase
         );
     }
 
-
-
     /**
      * Create a mock token and ensure that the claims are created correctly
      * and that the APP ID is stored in a protected header
@@ -316,6 +319,58 @@ class KmsTokenTest extends TestCase
         $newToken = new KmsToken($this->getAwsSdk());
         $newToken->parseTokenString((string)$token, $this->getFileSystemCachePool());
         $this->assertTrue(true);
+    }
+
+    /**
+     * Tests that `setInvalidRefreshTokenIdCacheItem` puts an item into memcache with the expected
+     * key
+     *
+     * @group jwt
+     */
+    public function testSetInvalidRefreshTokenIdCacheItem()
+    {
+        $refreshTokenId = '1234';
+        $ttl = 600;
+        $mockMemcached = Mockery::mock(\Memcached::class);
+        $mockMemcached
+            ->shouldReceive('add')
+            ->withArgs(["r-$refreshTokenId", $refreshTokenId, $ttl])
+            ->andReturn(true);
+        $set = KmsToken::setInvalidRefreshTokenIdCacheItem($mockMemcached, $refreshTokenId, $ttl);
+        $this->assertTrue($set);
+    }
+
+    /**
+     * Tests that `getInvalidRefreshTokenIdCacheItem` returns null if a refresh token ID where the corresponding
+     * cache key does not exist on memcache.
+     *
+     * @group jwt
+     */
+    public function testGetInvalidRefreshTokenIdCacheItemWithCacheMiss()
+    {
+        $refreshTokenId = '1234';
+        $mockMemcached = Mockery::mock(\Memcached::class);
+        $mockMemcached->shouldReceive('get')->withArgs(['r-1234'])->andReturn(false);
+        $cacheItem = KmsToken::getInvalidRefreshTokenIdCacheItem($mockMemcached, $refreshTokenId);
+        $this->assertNull($cacheItem);
+    }
+
+    /**
+     * Tests that `getInvalidRefreshTokenIdCacheItem` returns a cache item if a refresh token ID where the corresponding
+     * cache key exists on memcache.
+     *
+     * @group jwt
+     */
+    public function testGetInvalidRefreshTokenIdCacheItemWithCacheHit()
+    {
+        // Test existing refresh token
+        $refreshTokenId = '5678';
+        $mockMemcached = Mockery::mock(\Memcached::class);
+        $mockMemcached->shouldReceive('get')->withArgs(['r-5678'])->andReturn('5678');
+        $cacheItem = KmsToken::getInvalidRefreshTokenIdCacheItem($mockMemcached, $refreshTokenId);
+        $this->assertNotNull($cacheItem);
+        // Cache item is the same as the refresh token ID
+        $this->assertEquals('5678', $cacheItem);
     }
 
     private function getMockKmsToken(
