@@ -263,11 +263,11 @@ abstract class KmsToken implements IToken
      *
      * @param string        $clientAppKmsMasterKeyId      Client Application KMS Master Key
      * @param string        $clientAppId                  Client Application ID
-     * @param array         $audience                     JWT `aud` claim
+     * @param array<string> $audience                     JWT `aud` claim
      * @param string        $subject                      JWT `sub` claim
      * @param int           $issuedAtTime                 JWT `iat` claim
      * @param int           $expiresAtTime                JWT `exp` claim
-     * @param array         $customClaims                 Custom JWT claims
+     * @param array<mixed>  $customClaims                 Custom JWT claims
      * @param string        $signingKeyId                 Name of signing key
      *
      * @return void
@@ -302,7 +302,7 @@ abstract class KmsToken implements IToken
      *
      * @param string        $clientAppId    Client Application ID
      * @param string        $ciphertext     The encrypted data encryption key
-     * @returns array
+     * @return array<string, string>
      */
     private function getTokenKeyHeaders(string $clientAppId, string $ciphertext): array
     {
@@ -355,11 +355,9 @@ abstract class KmsToken implements IToken
                 case 212:
                 case 213:
                     throw new TokenExpiredException;
-                    break;
                 // `aud`
                 case 22:
                     throw new InvalidAudienceClaimException;
-                    break;
                 case 32:
                     // `sub`
                     if (strpos(strtolower($e->getMessage()), 'subject')) {
@@ -437,14 +435,16 @@ abstract class KmsToken implements IToken
      *
      * @todo Specify void return type in PHP 7.1
      *
-     * @param array     $audience           JWT `aud` claim
-     * @param string    $subject            JWT `sub` claim
-     * @param int       $issuedAtTime       JWT `iat` claim
-     * @param int       $expiresAtTime      JWT `exp` claim
-     * @param array     $customClaims       Custom JWT claims
-     * @param array     $customHeaders      Custom JWT headers
-     * @param string    $signingKeyId       Name of signing key
-     * @param string    $signingKey         Value of signing key
+     * @param array<string> $audience           JWT `aud` claim
+     * @param string        $subject            JWT `sub` claim
+     * @param int           $issuedAtTime       JWT `iat` claim
+     * @param int           $expiresAtTime      JWT `exp` claim
+     * @param array<mixed>  $customClaims       Custom JWT claims
+     * @param array<mixed>  $customHeaders      Custom JWT headers
+     * @param string        $signingKeyId       Name of signing key
+     * @param string        $signingKey         Value of signing key
+     * @param string        $issuedBy           For testing purposes only
+     * @param array<string> $crit               For testing purposes only
      *
      * @return void
      */
@@ -457,9 +457,9 @@ abstract class KmsToken implements IToken
         array $customHeaders,
         string $signingKeyId,
         string $signingKey,
-        // For testing use only. Not part of the public API
+        // For testing use only.
         string $issuedBy = null,
-        // For testing use only. Not part of the public API
+        // For testing use only.
         array $crit = null
     ) {
         $claims = [
@@ -503,7 +503,7 @@ abstract class KmsToken implements IToken
      * Generate key data using the AWS KMS service
      *
      * @param string     $clientAppKmsMasterKeyId  Client Application KMS Master Key
-     * @returns Result
+     * @return Result<mixed>
      */
     private function generateKeyData(string $clientAppKmsMasterKeyId): Result
     {

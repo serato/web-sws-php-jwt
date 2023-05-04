@@ -11,7 +11,6 @@ use ReflectionClass;
 use PHPUnit\Framework\TestCase;
 use Serato\Jwt\Test\TokenImplementation\KmsToken;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter as FileSystemCachePool;
-use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 /**
@@ -33,16 +32,18 @@ class KmsTokenTest extends TestCase
     const TOKEN_EMAIL_VERIFIED = true;
     const TOKEN_SCOPES = ['scope1', 'scope2'];
 
+    /** @var string */
     private $fileSystemCacheDir;
+    /** @var FileSystemCachePool */
     protected static $fileSystemCachePool;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fileSystemCacheDir = sys_get_temp_dir() . '/fs-cache';
         $this->deleteFileSystemCacheDir();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->deleteFileSystemCacheDir();
     }
@@ -52,7 +53,7 @@ class KmsTokenTest extends TestCase
      *
      * @group jwt
      */
-    public function testValidParse()
+    public function testValidParse(): void
     {
         $token = new KmsToken($this->getAwsSdk());
         $token->create();
@@ -68,14 +69,14 @@ class KmsTokenTest extends TestCase
      *
      * @group jwt
      */
-    public function testPayloadTamperNoSignatureCheck()
+    public function testPayloadTamperNoSignatureCheck(): void
     {
         $token = new KmsToken($this->getAwsSdk());
         $token->create();
 
         $tokenParts = explode('.', (string)$token);
         $jsonString = base64_decode($tokenParts[1]);
-        $payload = json_decode($jsonString === false ? '' : $jsonString, true);
+        $payload = json_decode($jsonString == false ? '' : $jsonString, true);
         $payload['var1'] = 'fiddled_with';
 
         $jsonString = json_encode($payload);
@@ -94,7 +95,7 @@ class KmsTokenTest extends TestCase
      * @expectedException \Serato\Jwt\Exception\InvalidSignatureException
      * @group jwt
      */
-    public function testPayloadTamperSignatureCheck()
+    public function testPayloadTamperSignatureCheck(): void
     {
         $token = new KmsToken($this->getAwsSdk());
         $token->create();
@@ -102,7 +103,7 @@ class KmsTokenTest extends TestCase
         $tokenParts = explode('.', (string)$token);
 
         $jsonString = base64_decode($tokenParts[1]);
-        $payload = json_decode($jsonString === false ? '' : $jsonString, true);
+        $payload = json_decode($jsonString == false ? '' : $jsonString, true);
         $payload['var1'] = 'fiddled_with';
 
         $jsonString = json_encode($payload);
@@ -120,7 +121,7 @@ class KmsTokenTest extends TestCase
      *
      * @group jwt
      */
-    public function testCheckClaimsAllValid()
+    public function testCheckClaimsAllValid(): void
     {
         $token = new KmsToken($this->getAwsSdk());
         $token->create();
@@ -135,7 +136,7 @@ class KmsTokenTest extends TestCase
      * @expectedException \Serato\Jwt\Exception\InvalidIssuerClaimException
      * @group jwt
      */
-    public function testCheckClaimsInvalidIssuer()
+    public function testCheckClaimsInvalidIssuer(): void
     {
         $token = new KmsToken($this->getAwsSdk());
         $token->create('fake issuer');
@@ -149,7 +150,7 @@ class KmsTokenTest extends TestCase
      * @expectedException \Serato\Jwt\Exception\TokenExpiredException
      * @group jwt
      */
-    public function testCheckClaimsTokenExpired()
+    public function testCheckClaimsTokenExpired(): void
     {
         $token = new KmsToken($this->getAwsSdk());
         $token->create(null, time() - (2 * 60 * 60));
@@ -163,7 +164,7 @@ class KmsTokenTest extends TestCase
      * @expectedException \Serato\Jwt\Exception\InvalidAudienceClaimException
      * @group jwt
      */
-    public function testCheckClaimsInvalidAudience()
+    public function testCheckClaimsInvalidAudience(): void
     {
         $token = new KmsToken($this->getAwsSdk());
         $token->create();
@@ -177,7 +178,7 @@ class KmsTokenTest extends TestCase
      * @expectedException \Serato\Jwt\Exception\InvalidSubjectClaimException
      * @group jwt
      */
-    public function testCheckClaimsInvalidSubject()
+    public function testCheckClaimsInvalidSubject(): void
     {
         $token = new KmsToken($this->getAwsSdk());
         $token->create();
@@ -191,7 +192,7 @@ class KmsTokenTest extends TestCase
      * @expectedException \Serato\Jwt\Exception\CriticalClaimsVerificationException
      * @group jwt
      */
-    public function testFailedCriticalClaimsHeaderCheck()
+    public function testFailedCriticalClaimsHeaderCheck(): void
     {
         $token = new KmsToken($this->getAwsSdk());
         $token->create(null, null, ['iat']);
@@ -203,7 +204,7 @@ class KmsTokenTest extends TestCase
      *
      * @group jwt
      */
-    public function testCustomProtectedHeaderValue()
+    public function testCustomProtectedHeaderValue(): void
     {
         $headers = [
             'protected_header_1' => 'value_1',
@@ -226,7 +227,7 @@ class KmsTokenTest extends TestCase
      * Create a mock token and ensure that the claims are created correctly
      * and that the APP ID is stored in a protected header
      */
-    public function testCreateFromUserRefreshToken()
+    public function testCreateFromUserRefreshToken(): void
     {
         $token = $this->getMockKmsToken();
         $this->assertEquals(
@@ -247,7 +248,7 @@ class KmsTokenTest extends TestCase
      * Create a mock token out of an encoded string representation of the token.
      * Confirm the token is valid.
      */
-    public function testCreateFromJsonValidAudience()
+    public function testCreateFromJsonValidAudience(): void
     {
         $token = $this->getMockKmsToken();
 
@@ -277,7 +278,7 @@ class KmsTokenTest extends TestCase
      *
      * @expectedException Serato\Jwt\Exception\InvalidAudienceClaimException
      */
-    public function testCreateFromJsonInvalidAudience()
+    public function testCreateFromJsonInvalidAudience(): void
     {
         $token = $this->getMockKmsToken();
         $newToken = new KmsToken($this->getAwsSdk());
@@ -288,7 +289,7 @@ class KmsTokenTest extends TestCase
     /**
      * Test caching functionality
      */
-    public function testCreateFromJsonEncryptionKeyCache()
+    public function testCreateFromJsonEncryptionKeyCache(): void
     {
         $token = $this->getMockKmsToken();
 
@@ -398,7 +399,7 @@ class KmsTokenTest extends TestCase
         return self::$fileSystemCachePool;
     }
 
-    private function deleteFileSystemCacheDir()
+    private function deleteFileSystemCacheDir(): void
     {
         if ($this->fileSystemCacheDir !== null && is_dir($this->fileSystemCacheDir)) {
             exec('rm -rf '. escapeshellarg($this->fileSystemCacheDir));

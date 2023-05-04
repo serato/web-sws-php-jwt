@@ -1,3 +1,5 @@
+apt update && apt install -y git zip unzip
+
 # Download and install Composer
 # I _could_ mount a volume and install it there. But it only takes
 # a few seconds so do it everytime the container is run.

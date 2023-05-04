@@ -11,12 +11,17 @@ class KmsToken extends JwtKmsToken
     #const TOKEN_CLAIM_SUB = 'my_subject';
     const TOKEN_SIGNING_KEY_ID = 'JWS_ACCESS_COMPACT_HS512';
 
+    /** @var array<mixed> */
     protected $audience = ['audience.member'];
+    /** @var string */
     protected $signer_id = 'JWS_ACCESS_COMPACT_HS512';
+    /** @var string */
     protected $signer_key = 'abcdefgh';
+    /** @var string */
     protected $sub = 'test subject';
 
-    public function create($issuedBy = null, int $exp = null, array $crit = null, array $headers = [])
+    /** @phpstan-ignore-next-line */
+    public function create($issuedBy = null, int $exp = null, array $crit = null, array $headers = []): void
     {
         $this->createToken(
             $this->audience,
@@ -36,7 +41,7 @@ class KmsToken extends JwtKmsToken
      *
      * @todo Specify void return type in PHP 7.1
      */
-    public function createFromJson(string $json, bool $verifySig = true)
+    public function createFromJson(string $json, bool $verifySig = true): void
     {
         $this->parseBase64EncodedTokenData($json);
         if ($verifySig) {
@@ -48,7 +53,7 @@ class KmsToken extends JwtKmsToken
      *
      * @todo Specify void return type in PHP 7.1
      */
-    public function verifyClaims(string $aud = null, string $sub = null)
+    public function verifyClaims(string $aud = null, string $sub = null): void
     {
         $this->checkClaims(
             $aud ?? $this->audience[0],
@@ -59,16 +64,16 @@ class KmsToken extends JwtKmsToken
     /**
      * Create an access token
      *
-     * @param array     $audience                   JWT `aud` claim
-     * @param string    $subject                    JWT `sub` claim
-     * @param int       $issuedAtTime               JWT `iat` claim
-     * @param int       $expiresAtTime              JWT `exp` claim
-     * @param string    $clientAppKmsMasterKeyId    Client Application KMS Master Key
-     * @param string    $clientAppId                Client Application ID
-     * @param int       $userId                     User ID
-     * @param string    $userEmail                  User Email
-     * @param bool      $emailVerified              Email Verification
-     * @param array     $scopes                     An array of scopes
+     * @param array<string> $audience                   JWT `aud` claim
+     * @param string        $subject                    JWT `sub` claim
+     * @param int           $issuedAtTime               JWT `iat` claim
+     * @param int           $expiresAtTime              JWT `exp` claim
+     * @param string        $clientAppKmsMasterKeyId    Client Application KMS Master Key
+     * @param string        $clientAppId                Client Application ID
+     * @param int           $userId                     User ID
+     * @param string        $userEmail                  User Email
+     * @param bool          $emailVerified              Email Verification
+     * @param array<mixed>  $scopes                     An array of scopes
      *
      * @return KmsToken
      */
@@ -108,7 +113,7 @@ class KmsToken extends JwtKmsToken
         return $this;
     }
 
-    public function validate(string $audience, string $subject)
+    public function validate(string $audience, string $subject): void
     {
         $this->checkClaims($audience, $subject);
     }
@@ -116,7 +121,7 @@ class KmsToken extends JwtKmsToken
     public function parseTokenString(
         string $tokenString,
         CacheItemPoolInterface $cache = null
-    ) {
+    ): void {
         $this->parseBase64EncodedTokenDataWithKms(
             $tokenString,
             self::TOKEN_SIGNING_KEY_ID,

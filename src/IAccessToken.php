@@ -23,7 +23,7 @@ interface IAccessToken extends IToken
      * @param int $userId               User ID
      * @param string $userEmail         User email address
      * @param bool $userIsEmailVerified Indicates whether or not the user has verified their email address
-     * @param array $scopes            Scopes of access for the user
+     * @param array<mixed> $scopes      Scopes of access for the user
      * @param string $refreshTokenId    ID of Refresh Token that "produces" this Access token
      *
      * @return self

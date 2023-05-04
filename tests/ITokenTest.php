@@ -95,7 +95,7 @@ abstract class ITokenTest extends TestCase
      *
      * @group jwt
      */
-    public function testSetInvalidRefreshTokenIdCacheItem()
+    public function testSetInvalidRefreshTokenIdCacheItem(): void
     {
         $token = $this->getToken();
 
@@ -116,7 +116,7 @@ abstract class ITokenTest extends TestCase
      *
      * @group jwt
      */
-    public function testGetInvalidRefreshTokenIdCacheItemWithCacheMiss()
+    public function testGetInvalidRefreshTokenIdCacheItemWithCacheMiss(): void
     {
         $token = $this->getToken();
 
@@ -133,7 +133,7 @@ abstract class ITokenTest extends TestCase
      *
      * @group jwt
      */
-    public function testGetInvalidRefreshTokenIdCacheItemWithCacheHit()
+    public function testGetInvalidRefreshTokenIdCacheItemWithCacheHit(): void
     {
         $token = $this->getToken();
         
@@ -179,5 +179,6 @@ abstract class ITokenTest extends TestCase
         ]);
     }
 
-    abstract protected function getToken($expiredIssuedAt = null);
+    /** @phpstan-ignore-next-line */
+    abstract protected function getToken(int $expiredIssuedAt = null);
 }

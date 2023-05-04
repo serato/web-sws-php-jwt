@@ -3,6 +3,9 @@ parameters:
     paths:
         - %currentWorkingDirectory%/src
         - %currentWorkingDirectory%/tests
+    excludePaths:
+        analyse:
+            - src/Checker
     ignoreErrors:
         - '#not subtype of Throwable#'
 includes:

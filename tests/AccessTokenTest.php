@@ -11,7 +11,7 @@ use Serato\Jwt\AccessToken;
  */
 class AccessTokenTest extends IAccessTokenTest
 {
-    protected function getToken($issuedAt = null): IAccessToken
+    protected function getToken(int $issuedAt = null): IAccessToken
     {
         $token = new AccessToken($this->getAwsSdk());
         return $token->create(
