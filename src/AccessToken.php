@@ -3,13 +3,7 @@ declare(strict_types=1);
 
 namespace Serato\Jwt;
 
-use Serato\Jwt\Exception\InvalidSignatureException;
 use Serato\Jwt\Exception\TokenExpiredException;
-use Serato\Jwt\Exception\InvalidAudienceClaimException;
-use Serato\Jwt\Exception\InvalidSubjectClaimException;
-use Serato\Jwt\Exception\InvalidIssuerClaimException;
-use Serato\Jwt\Exception\CriticalClaimsVerificationException;
-use Serato\Jwt\Exception\UnhandledTokenCheckException;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -17,44 +11,42 @@ use Psr\Cache\CacheItemPoolInterface;
  *
  * Implements a JWS `access` token.
  */
-class AccessToken extends KmsToken
+class AccessToken extends KmsToken implements IAccessToken
 {
     private const TOKEN_CLAIM_SUB = 'access';
     private const TOKEN_SIGNING_KEY_ID = 'JWS_ACCESS_COMPACT_HS512';
     private const REFRESH_TOKEN_ID_CLAIM = 'rtid';
 
     /**
-     * Creates a JWS access token
-     *
-     * @return self
+     * @inheritdoc
     */
     final public function create(
-        string $clientAppId,
-        string $clientAppName,
-        int $clientAppAccessTokenExpirySeconds,
-        array $clientAppAccessTokenDefaultAudience,
-        string $clientAppKmsMasterKeyId,
+        string $appId,
+        string $appName,
+        int $expirySeconds,
+        array $audience,
+        string $kmsMasterKeyId,
         int $userId,
         string $userEmail,
         bool $userIsEmailVerified,
-        array $userScopesOfAccess,
+        array $scopes,
         string $refreshTokenId
-    ): self
+    ): IAccessToken
     {
         $this->createTokenWithKms(
-            $clientAppKmsMasterKeyId,
-            $clientAppId,
-            $clientAppAccessTokenDefaultAudience,
+            $kmsMasterKeyId,
+            $appId,
+            $audience,
             self::TOKEN_CLAIM_SUB,
             time(),
-            time() + $clientAppAccessTokenExpirySeconds,
+            time() + $expirySeconds,
             [
-                'app_id'            => $clientAppId,
-                'app_name'          => $clientAppName,
+                'app_id'            => $appId,
+                'app_name'          => $appName,
                 'uid'               => $userId,
                 'email'             => $userEmail,
                 'email_verified'    => $userIsEmailVerified,
-                'scopes'            => $userScopesOfAccess,
+                'scopes'            => $scopes,
                 'rtid'              => $refreshTokenId
             ],
             self::TOKEN_SIGNING_KEY_ID
@@ -63,21 +55,9 @@ class AccessToken extends KmsToken
     }
 
     /**
-     * Check the presence and validity of the claims within an access token
-     *
-     * @todo Specify void return type in PHP 7.1
-     *
-     * @param string    $webServiceUri     The URI of the validating web service
-     * @param \Memcached $memcache Memcache connection
-     *
-     * @throws TokenExpiredException
-     * @throws InvalidAudienceClaimException
-     * @throws InvalidSubjectClaimException
-     * @throws InvalidIssuerClaimException
-     * @throws CriticalClaimsVerificationException
-     * @throws UnhandledTokenCheckException
+     * @inheritdoc
      */
-    final public function validate(string $webServiceUri, \Memcached $memcache)
+    final public function validate(string $webServiceUri, \Memcached $memcache): void
     {
         $this->checkClaims($webServiceUri, self::TOKEN_CLAIM_SUB);
         $rtid = '';
@@ -94,20 +74,13 @@ class AccessToken extends KmsToken
         }
     }
 
-     /**
-     * Create the token from a JSON string and verify the token's signature
-     *
-     * @todo Specify void return type in PHP 7.1
-     *
-     * @param string                    $tokenString   Base64-encoded JWS token string
-     * @param CacheItemPoolInterface    $cache         PSR-6 cache item pool
-     *
-     * @throws InvalidSignatureException
+    /**
+     * @inheritdoc
      */
     final public function parseTokenString(
         string $tokenString,
         CacheItemPoolInterface $cache = null
-    ) {
+    ): void {
         $this->parseBase64EncodedTokenDataWithKms(
             $tokenString,
             self::TOKEN_SIGNING_KEY_ID,
