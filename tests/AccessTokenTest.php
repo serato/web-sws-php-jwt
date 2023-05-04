@@ -3,15 +3,15 @@ declare(strict_types=1);
 
 namespace Serato\Jwt\Test;
 
-use Serato\Jwt\IToken;
+use Serato\Jwt\IAccessToken;
 use Serato\Jwt\AccessToken;
 
 /**
  * Unit test for the `Serato\Jwt\AccessToken` implementation of `Serato\Jwt\ITokenTest`
  */
-class AccessTokenTest extends ITokenTest
+class AccessTokenTest extends IAccessTokenTest
 {
-    protected function getToken(): IToken
+    protected function getToken($issuedAt = null): IAccessToken
     {
         $token = new AccessToken($this->getAwsSdk());
         return $token->create(
@@ -24,7 +24,8 @@ class AccessTokenTest extends ITokenTest
             self::USER_EMAIL,
             self::USER_EMAIL_IS_VERIFIED,
             self::USER_SCOPES_OF_ACCESS,
-            self::REFRESH_TOKEN_ID
+            self::REFRESH_TOKEN_ID,
+            $issuedAt
         );
     }
 }

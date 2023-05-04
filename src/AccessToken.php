@@ -30,16 +30,20 @@ class AccessToken extends KmsToken implements IAccessToken
         string $userEmail,
         bool $userIsEmailVerified,
         array $scopes,
-        string $refreshTokenId
+        string $refreshTokenId,
+        int $issuedAt = null
     ): IAccessToken
     {
+        if ($issuedAt === null) {
+            $issuedAt = time();
+        }
         $this->createTokenWithKms(
             $kmsMasterKeyId,
             $appId,
             $audience,
             self::TOKEN_CLAIM_SUB,
-            time(),
-            time() + $expirySeconds,
+            $issuedAt,
+            $issuedAt + $expirySeconds,
             [
                 'app_id'            => $appId,
                 'app_name'          => $appName,

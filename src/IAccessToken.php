@@ -37,7 +37,8 @@ interface IAccessToken extends IToken {
         string $userEmail,
         bool $userIsEmailVerified,
         array $scopes,
-        string $refreshTokenId
+        string $refreshTokenId,
+        int $issuedAt = null
     ): self;
 
     /**
