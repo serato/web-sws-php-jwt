@@ -12,7 +12,7 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Serato\Jwt\IToken;
 
 /**
- * Unit test for classes that implement Serato\Jwt\ITokenTest
+ * Unit test for classes that implement Serato\Jwt\IToken
  */
 abstract class ITokenTest extends TestCase
 {
