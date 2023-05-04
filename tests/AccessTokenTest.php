@@ -9,7 +9,7 @@ use Serato\Jwt\AccessToken;
 /**
  * Unit test for the `Serato\Jwt\AccessToken` implementation of `Serato\Jwt\ITokenTest`
  */
-class ITokenAccessTokenTest extends ITokenTest
+class AccessTokenTest extends ITokenTest
 {
     protected function getToken(): IToken
     {
