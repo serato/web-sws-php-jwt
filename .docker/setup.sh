@@ -1,10 +1,3 @@
-# Install git an zip/unzip (required by composer)
-apt update && apt install -y git zip unzip libgmp-dev
-
-# Configure and install PHP GMP extension (this is not included in the base container images)
-docker-php-ext-configure gmp
-docker-php-ext-install gmp
-
 # Download and install Composer
 # I _could_ mount a volume and install it there. But it only takes
 # a few seconds so do it everytime the container is run.
