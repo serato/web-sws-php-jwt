@@ -8,35 +8,34 @@ use Aws\Result;
 use Aws\MockHandler;
 use \PHPUnit\Framework\TestCase;
 use Serato\Jwt\AccessToken;
-// use Mockery;
-// use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Serato\Jwt\IToken;
 
 /**
- * Unit and integration tests for Serat\Jwt\Access
+ * Unit test for classes that implement Serato\Jwt\ITokenTest
  */
-class AccessTokenTest extends TestCase
+abstract class ITokenTest extends TestCase
 {
-    private const CLIENT_APP_ID = '123abc';
-    private const CLIENT_APP_NAME = 'my app';
-    private const CLIENT_APP_ACCESS_TOKEN_EXPIRY_SECONDS = 10;
-    private const CLIENT_APP_ACCESS_TOKEN_DEFAULT_AUDIENCE = [
+    protected const CLIENT_APP_ID = '123abc';
+    protected const CLIENT_APP_NAME = 'my app';
+    protected const CLIENT_APP_ACCESS_TOKEN_EXPIRY_SECONDS = 10;
+    protected const CLIENT_APP_ACCESS_TOKEN_DEFAULT_AUDIENCE = [
         'profile.serato.com',
         'ai-proxy.serato.com',
         'cloudlib.serato.com'
     ];
-    private const CLIENT_APP_KMS_MASTER_KEY_ID = 'master-key-xyz';
-    private const USER_ID = 987654;
-    private const USER_EMAIL = 'user@example.net';
-    private const USER_EMAIL_IS_VERIFIED = false;
-    private const USER_SCOPES_OF_ACCESS = [
+    protected const CLIENT_APP_KMS_MASTER_KEY_ID = 'master-key-xyz';
+    protected const USER_ID = 987654;
+    protected const USER_EMAIL = 'user@example.net';
+    protected const USER_EMAIL_IS_VERIFIED = false;
+    protected const USER_SCOPES_OF_ACCESS = [
         'profile.serato.com' => ['profile-edit'],
         'ai-proxy.serato.com' => ['user-read'],
         'cloudlib.serato.com' => ['user-read']
     ];
-    private const REFRESH_TOKEN_ID = 'rftid-456-def';
+    protected const REFRESH_TOKEN_ID = 'rftid-456-def';
 
-    private const ENCRYPTION_KEY_CIPHERTEXT = '48d7fgd87gfd97vs8sdsd7df7s87';
-    private const ENCRYPTION_KEY_PLAINTEXT = '123456789abcdefg';
+    protected const ENCRYPTION_KEY_CIPHERTEXT = '48d7fgd87gfd97vs8sdsd7df7s87';
+    protected const ENCRYPTION_KEY_PLAINTEXT = '123456789abcdefg';
 
     /**
      * Tests that the AccessToken::getClaims method returns the expected results
@@ -84,7 +83,7 @@ class AccessTokenTest extends TestCase
         $this->assertTrue(is_string((string)$token));
     }
 
-    private function getAwsSdk() : Sdk
+    protected function getAwsSdk() : Sdk
     {
         $mock = new MockHandler();
         
@@ -114,20 +113,5 @@ class AccessTokenTest extends TestCase
         ]);
     }
 
-    private function getToken(): AccessToken
-    {
-        $token = new AccessToken($this->getAwsSdk());
-        return $token->create(
-            self::CLIENT_APP_ID,
-            self::CLIENT_APP_NAME,
-            self::CLIENT_APP_ACCESS_TOKEN_EXPIRY_SECONDS,
-            self::CLIENT_APP_ACCESS_TOKEN_DEFAULT_AUDIENCE,
-            self::CLIENT_APP_KMS_MASTER_KEY_ID,
-            self::USER_ID,
-            self::USER_EMAIL,
-            self::USER_EMAIL_IS_VERIFIED,
-            self::USER_SCOPES_OF_ACCESS,
-            self::REFRESH_TOKEN_ID
-        );
-    }
+    abstract protected function getToken(): IToken;
 }
