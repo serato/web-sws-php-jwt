@@ -7,7 +7,8 @@ use Aws\Sdk;
 use Aws\Result;
 use Aws\MockHandler;
 use \PHPUnit\Framework\TestCase;
-use Serato\Jwt\AccessToken;
+use Mockery;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Serato\Jwt\IToken;
 
 /**
@@ -15,6 +16,8 @@ use Serato\Jwt\IToken;
  */
 abstract class ITokenTest extends TestCase
 {
+    use MockeryPHPUnitIntegration;
+
     protected const CLIENT_APP_ID = '123abc';
     protected const CLIENT_APP_NAME = 'my app';
     protected const CLIENT_APP_ACCESS_TOKEN_EXPIRY_SECONDS = 10;
@@ -82,6 +85,67 @@ abstract class ITokenTest extends TestCase
         $token = $this->getToken();
         $this->assertTrue(is_string((string)$token));
     }
+
+
+    /**
+     * Tests that `setInvalidRefreshTokenIdCacheItem` puts an item into memcache with the expected
+     * key
+     *
+     * @group jwt
+     */
+    public function testSetInvalidRefreshTokenIdCacheItem()
+    {
+        $token = $this->getToken();
+
+        $refreshTokenId = '1234';
+        $ttl = 600;
+        $mockMemcached = Mockery::mock(\Memcached::class);
+        $mockMemcached
+            ->shouldReceive('add')
+            ->withArgs(["r-$refreshTokenId", $refreshTokenId, $ttl])
+            ->andReturn(true);
+        $set = $token::setInvalidRefreshTokenIdCacheItem($mockMemcached, $refreshTokenId, $ttl);
+        $this->assertTrue($set);
+    }
+
+    /**
+     * Tests that `getInvalidRefreshTokenIdCacheItem` returns null if a refresh token ID where the corresponding
+     * cache key does not exist on memcache.
+     *
+     * @group jwt
+     */
+    public function testGetInvalidRefreshTokenIdCacheItemWithCacheMiss()
+    {
+        $token = $this->getToken();
+
+        $refreshTokenId = '1234';
+        $mockMemcached = Mockery::mock(\Memcached::class);
+        $mockMemcached->shouldReceive('get')->withArgs(['r-1234'])->andReturn(false);
+        $cacheItem = $token::getInvalidRefreshTokenIdCacheItem($mockMemcached, $refreshTokenId);
+        $this->assertNull($cacheItem);
+    }
+
+    /**
+     * Tests that `getInvalidRefreshTokenIdCacheItem` returns a cache item if a refresh token ID where the corresponding
+     * cache key exists on memcache.
+     *
+     * @group jwt
+     */
+    public function testGetInvalidRefreshTokenIdCacheItemWithCacheHit()
+    {
+        $token = $this->getToken();
+        
+        // Test existing refresh token
+        $refreshTokenId = '5678';
+        $mockMemcached = Mockery::mock(\Memcached::class);
+        $mockMemcached->shouldReceive('get')->withArgs(['r-5678'])->andReturn('5678');
+        $cacheItem = $token::getInvalidRefreshTokenIdCacheItem($mockMemcached, $refreshTokenId);
+        $this->assertNotNull($cacheItem);
+        // Cache item is the same as the refresh token ID
+        $this->assertEquals('5678', $cacheItem);
+    }
+
+
 
     protected function getAwsSdk() : Sdk
     {
