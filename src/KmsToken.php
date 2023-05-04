@@ -91,9 +91,7 @@ abstract class KmsToken implements IToken
     }
 
     /**
-     * Get the AWS client
-     *
-     * @return AwsSdk
+     * @inheritdoc
      */
     public function getAws(): AwsSdk
     {
@@ -101,9 +99,7 @@ abstract class KmsToken implements IToken
     }
 
     /**
-     * Get the compact JSON notation form of the token
-     *
-     * @return string
+     * @inheritDoc
      */
     final public function __toString(): string
     {
@@ -111,11 +107,7 @@ abstract class KmsToken implements IToken
     }
 
     /**
-     * Get a claim's value from a token
-     *
-     * @param string $key   Name of claim
-     *
-     * @return mixed
+     * @inheritDoc
      */
     final public function getClaim(string $key)
     {
@@ -123,11 +115,7 @@ abstract class KmsToken implements IToken
     }
 
     /**
-     * Get a protected header's value from the token
-     *
-     * @param string $key   Name of header
-     *
-     * @return mixed
+     * @inheritDoc
      */
     final public function getProtectedHeader(string $key)
     {
@@ -137,13 +125,7 @@ abstract class KmsToken implements IToken
 
 
     /**
-     * Writes a refresh token ID into the given memcache connection with a time to live value.
-     * The refresh token is considered invalidated when placed into memcache.
-     *
-     * @param \Memcached $memcache Memcache connection
-     * @param string $refreshTokenId Refresh token ID
-     * @param integer $ttl Expiry time in seconds
-     * @return boolean
+     * @inheritDoc
      */
     public static function setInvalidRefreshTokenIdCacheItem(
         \Memcached $memcache,
@@ -155,11 +137,7 @@ abstract class KmsToken implements IToken
     }
 
     /**
-     * Reads an invalidated refresh token ID from the given memcached connection. Returns null if it doesn't exist.
-     *
-     * @param \Memcached $memcache Memcache connection
-     * @param string $refreshTokenId Refresh token ID
-     * @return string|null
+     * @inheritDoc
      */
     public static function getInvalidRefreshTokenIdCacheItem(
         \Memcached $memcache,
