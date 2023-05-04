@@ -9,7 +9,6 @@ use Aws\MockHandler;
 use \PHPUnit\Framework\TestCase;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use Serato\Jwt\IToken;
 
 /**
  * Unit test for classes that implement Serato\Jwt\IToken
@@ -177,5 +176,5 @@ abstract class ITokenTest extends TestCase
         ]);
     }
 
-    abstract protected function getToken(): IToken;
+    abstract protected function getToken();
 }
