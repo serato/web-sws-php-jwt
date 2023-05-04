@@ -179,5 +179,5 @@ abstract class ITokenTest extends TestCase
         ]);
     }
 
-    abstract protected function getToken();
+    abstract protected function getToken($expiredIssuedAt = null);
 }
