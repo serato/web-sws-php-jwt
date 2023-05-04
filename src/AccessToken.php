@@ -19,9 +19,48 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class AccessToken extends KmsToken
 {
-    const TOKEN_CLAIM_SUB = 'access';
-    const TOKEN_SIGNING_KEY_ID = 'JWS_ACCESS_COMPACT_HS512';
-    const REFRESH_TOKEN_ID_CLAIM = 'rtid';
+    private const TOKEN_CLAIM_SUB = 'access';
+    private const TOKEN_SIGNING_KEY_ID = 'JWS_ACCESS_COMPACT_HS512';
+    private const REFRESH_TOKEN_ID_CLAIM = 'rtid';
+
+    /**
+     * Creates a JWS access token
+     *
+     * @return self
+    */
+    final public function create(
+        string $clientAppId,
+        string $clientAppName,
+        int $clientAppAccessTokenExpirySeconds,
+        array $clientAppAccessTokenDefaultAudience,
+        string $clientAppKmsMasterKeyId,
+        int $userId,
+        string $userEmail,
+        bool $userIsEmailVerified,
+        array $userScopesOfAccess,
+        string $refreshTokenId
+    ): self
+    {
+        $this->createTokenWithKms(
+            $clientAppKmsMasterKeyId,
+            $clientAppId,
+            $clientAppAccessTokenDefaultAudience,
+            self::TOKEN_CLAIM_SUB,
+            time(),
+            time() + $clientAppAccessTokenExpirySeconds,
+            [
+                'app_id'            => $clientAppId,
+                'app_name'          => $clientAppName,
+                'uid'               => $userId,
+                'email'             => $userEmail,
+                'email_verified'    => $userIsEmailVerified,
+                'scopes'            => $userScopesOfAccess,
+                'rtid'              => $refreshTokenId
+            ],
+            self::TOKEN_SIGNING_KEY_ID
+        );
+        return $this;
+    }
 
     /**
      * Check the presence and validity of the claims within an access token

@@ -345,7 +345,7 @@ class KmsTokenTest extends TestCase
         );
     }
 
-    protected function getAwsSdk() : Sdk
+    private function getAwsSdk() : Sdk
     {
         $mock = new MockHandler();
         
