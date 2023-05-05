@@ -40,41 +40,25 @@ use Exception;
  */
 abstract class KmsToken implements IToken
 {
-    /**
-     * The KMS key spec used to create hashing secrets
-     */
+    /** @var string */
     const KMS_KEY_SPEC = 'AES_128';
 
-    /**
-     * The name of the JWT header that stores the client application ID
-     */
+    /** @var string */
     const APP_ID_HEADER_NAME = 'aid';
     
-    /**
-     * The name of the JWT header that stores the encrypted hash secret
-     */
+    /** @var string */
     const KEY_CIPHERTEXT_HEADER_NAME = 'kct';
     
-    /**
-     * The name of the JWT header that stores a cache id for the encrypted hash secret
-     */
+    /** @var string */
     const KEY_ID_HEADER_NAME = 'kid';
 
-    /**
-     * The algorithm used to generate the JWS signature
-     */
+    /** @var string */
     private const SIGNER_ALG = 'HS512';
 
-    /**
-     * JWS token object
-     *
-     * @var JWS
-     */
+    /** @var JWS */
     private $token;
 
-    /**
-     * The value of the `iat` reserved claim within the JWT token
-     */
+    /** @var string */
     protected const ISSUED_BY = 'id.serato.io';
 
     /** @var AwsSdk */
@@ -286,18 +270,42 @@ abstract class KmsToken implements IToken
     ) {
         // Generate a new hashing secret key
         $generatedKey = $this->generateKeyData($clientAppKmsMasterKeyId);
-        // Create the token
-        $this->createToken(
-            $audience,
-            $subject,
-            $issuedAtTime,
-            $expiresAtTime,
-            $customClaims,
-            $this->getTokenKeyHeaders($clientAppId, base64_encode($generatedKey['CiphertextBlob'])),
-            $signingKeyId,
-            $generatedKey['Plaintext'],
-            $issuedBy
+        
+        $claims = [
+            'iss' => $issuedBy ?? self::ISSUED_BY,
+            'aud' => $audience,
+            'sub' => $subject,
+            'iat' => $issuedAtTime,
+            'exp' => $expiresAtTime
+        ];
+
+        $jws = JWSFactory::createJWS(array_merge($claims, $customClaims));
+
+        /*
+        FYI, the `crit` header lists all of the claims in the payload that must be "checked".
+        ie. They must be present in the payload and must be subjected to a verification
+        step via a class that implements the Jose\Checker\ClaimCheckerInterface interface.
+
+        The `crit` header itself is checked via the Jose\Checker\CriticalHeaderChecker class.
+        
+        See self::checkClaims for implementation of checkers.
+        */
+
+        $jws = $jws->addSignatureInformation(
+            $this->getSigner($signingKeyId, $generatedKey['Plaintext']),
+            array_merge(
+                [
+                    'alg' => self::SIGNER_ALG,
+                    'crit' => $crit ?? ['iss', 'aud', 'sub', 'exp']
+                ],
+                $this->getTokenKeyHeaders($clientAppId, base64_encode($generatedKey['CiphertextBlob']))
+            )
         );
+
+        $signer = Signer::createSigner([self::SIGNER_ALG]);
+        $signer->sign($jws);
+
+        $this->token = $jws;
     }
 
     /**
@@ -427,75 +435,6 @@ abstract class KmsToken implements IToken
         }
     }
 
-    /**
-     * Construct a JWS token
-     *
-     * @todo Specify void return type in PHP 7.1
-     *
-     * @param array<string> $audience           JWT `aud` claim
-     * @param string        $subject            JWT `sub` claim
-     * @param int           $issuedAtTime       JWT `iat` claim
-     * @param int           $expiresAtTime      JWT `exp` claim
-     * @param array<mixed>  $customClaims       Custom JWT claims
-     * @param array<mixed>  $customHeaders      Custom JWT headers
-     * @param string        $signingKeyId       Name of signing key
-     * @param string        $signingKey         Value of signing key
-     * @param string        $issuedBy           For testing purposes only
-     * @param array<string> $crit               For testing purposes only
-     *
-     * @return void
-     */
-    final protected function createToken(
-        array $audience,
-        string $subject,
-        int $issuedAtTime,
-        int $expiresAtTime,
-        array $customClaims,
-        array $customHeaders,
-        string $signingKeyId,
-        string $signingKey,
-        // For testing use only.
-        string $issuedBy = null,
-        // For testing use only.
-        array $crit = null
-    ) {
-        $claims = [
-            'iss' => $issuedBy ?? self::ISSUED_BY,
-            'aud' => $audience,
-            'sub' => $subject,
-            'iat' => $issuedAtTime,
-            'exp' => $expiresAtTime
-        ];
-
-        $jws = JWSFactory::createJWS(array_merge($claims, $customClaims));
-
-        /*
-        FYI, the `crit` header lists all of the claims in the payload that must be "checked".
-        ie. They must be present in the payload and must be subjected to a verification
-        step via a class that implements the Jose\Checker\ClaimCheckerInterface interface.
-
-        The `crit` header itself is checked via the Jose\Checker\CriticalHeaderChecker class.
-        
-        See self::checkClaims for implementation of checkers.
-        */
-
-        $jws = $jws->addSignatureInformation(
-            $this->getSigner($signingKeyId, $signingKey),
-            array_merge(
-                [
-                    'alg' => self::SIGNER_ALG,
-                    'crit' => $crit ?? ['iss', 'aud', 'sub', 'exp']
-                ],
-                $customHeaders
-            )
-        );
-
-        $signer = Signer::createSigner([self::SIGNER_ALG]);
-        $signer->sign($jws);
-
-        $this->token = $jws;
-    }
- 
     /**
      * Generate key data using the AWS KMS service
      *
