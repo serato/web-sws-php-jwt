@@ -98,12 +98,15 @@ abstract class IAccessTokenTest extends ITokenTest
         $token->validate($this->getValidAudienceName(), $mockMemcached);
     }
 
-    public function tesValidToken(): void
+    /**
+     * @group xxx
+     */
+    public function testValidToken(): void
     {
         $token = $this->getToken();
 
         $mockMemcached = Mockery::mock(\Memcached::class);
-        $mockMemcached->shouldReceive('get')->andReturn('a-refresh-token-id');
+        $mockMemcached->shouldReceive('get');
 
         $this->assertNull($token->validate($this->getValidAudienceName(), $mockMemcached));
     }
