@@ -11,21 +11,30 @@ use Serato\Jwt\AccessToken;
  */
 class AccessTokenTest extends IAccessTokenTest
 {
-    protected function getToken(int $issuedAt = null): IAccessToken
+    /**
+     * @param array<mixed> $params
+     * @return IAccessToken
+     */
+    protected function getToken(array $params = null): IAccessToken
     {
+        if ($params === null) {
+            $params = $this->getDefaultTokenParams();
+        }
         $token = new AccessToken($this->getAwsSdk());
         return $token->create(
-            self::CLIENT_APP_ID,
-            self::CLIENT_APP_NAME,
-            self::CLIENT_APP_ACCESS_TOKEN_EXPIRY_SECONDS,
-            self::CLIENT_APP_ACCESS_TOKEN_DEFAULT_AUDIENCE,
-            self::CLIENT_APP_KMS_MASTER_KEY_ID,
-            self::USER_ID,
-            self::USER_EMAIL,
-            self::USER_EMAIL_IS_VERIFIED,
-            self::USER_SCOPES_OF_ACCESS,
-            self::REFRESH_TOKEN_ID,
-            $issuedAt
+            $params['client_app_id'],
+            $params['client_app_name'],
+            $params['expires'],
+            $params['audience'],
+            $params['master_key_id'],
+            $params['user_id'],
+            $params['user_email'],
+            $params['user_email_verified'],
+            $params['scopes'],
+            $params['refresh_token_id'],
+            isset($params['subject']) ? $params['subject'] : null,
+            isset($params['issued_by']) ? $params['issued_by'] : null,
+            isset($params['issued_at']) ? $params['issued_at'] : null
         );
     }
 }

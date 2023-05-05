@@ -147,7 +147,10 @@ abstract class ITokenTest extends TestCase
         $this->assertEquals('5678', $cacheItem);
     }
 
-
+    protected function getValidAudienceName(): string
+    {
+        return self::CLIENT_APP_ACCESS_TOKEN_DEFAULT_AUDIENCE[0];
+    }
 
     protected function getAwsSdk() : Sdk
     {
@@ -179,6 +182,25 @@ abstract class ITokenTest extends TestCase
         ]);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    protected function getDefaultTokenParams(): array
+    {
+        return [
+            'client_app_id' => self::CLIENT_APP_ID,
+            'client_app_name' => self::CLIENT_APP_NAME,
+            'expires' => self::CLIENT_APP_ACCESS_TOKEN_EXPIRY_SECONDS,
+            'audience' => self::CLIENT_APP_ACCESS_TOKEN_DEFAULT_AUDIENCE,
+            'master_key_id' => self::CLIENT_APP_KMS_MASTER_KEY_ID,
+            'user_id' => self::USER_ID,
+            'user_email' => self::USER_EMAIL,
+            'user_email_verified' => self::USER_EMAIL_IS_VERIFIED,
+            'scopes' => self::USER_SCOPES_OF_ACCESS,
+            'refresh_token_id' => self::REFRESH_TOKEN_ID
+        ];
+    }
+
     /** @phpstan-ignore-next-line */
-    abstract protected function getToken(int $expiredIssuedAt = null);
+    abstract protected function getToken(array $params = null);
 }

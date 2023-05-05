@@ -124,7 +124,6 @@ abstract class KmsToken implements IToken
         return $sig[0]->getProtectedHeader($key);
     }
 
-
     /**
      * @inheritDoc
      */
@@ -173,20 +172,20 @@ abstract class KmsToken implements IToken
      * @param string                    $json      JSON-encoded token payload
      * @param string                    $keyId     Name of signing key
      * @param CacheItemPoolInterface    $cache     PSR-6 cache item pool
+     * @param string                    $cacheKey
      *
      * @return void
-     *
-     * @throws InvalidSignatureException
      */
     final protected function parseBase64EncodedTokenDataWithKms(
         string $json,
         string $keyId,
-        CacheItemPoolInterface $cache = null
+        CacheItemPoolInterface $cache = null,
+        string $cacheKey = null
     ) {
         $this->parseBase64EncodedTokenData($json);
         $this->verifySignature(
             $keyId,
-            $this->getPlaintextEncryptionKey($cache)
+            $this->getPlaintextEncryptionKey($cache, $cacheKey)
         );
     }
 
@@ -196,15 +195,16 @@ abstract class KmsToken implements IToken
      * from the key cipher text.
      *
      * @param CacheItemPoolInterface    $cache   PSR-6 cache item pool
+     * @param string                    $cacheKey
      *
      * @return string
      */
-    private function getPlaintextEncryptionKey(CacheItemPoolInterface $cache = null)
+    private function getPlaintextEncryptionKey(CacheItemPoolInterface $cache = null, $cacheKey = null)
     {
         if ($cache === null) {
             return $this->decryptCipherTextEncryptionKey();
         } else {
-            $key = $this->getCacheKey(
+            $key = $cacheKey ?? $this->getCacheKey(
                 $this->getProtectedHeader(self::APP_ID_HEADER_NAME),
                 $this->getProtectedHeader(self::KEY_ID_HEADER_NAME)
             );
@@ -269,6 +269,7 @@ abstract class KmsToken implements IToken
      * @param int           $expiresAtTime                JWT `exp` claim
      * @param array<mixed>  $customClaims                 Custom JWT claims
      * @param string        $signingKeyId                 Name of signing key
+     * @param string        $issuedBy                     Name of token issuer
      *
      * @return void
      */
@@ -280,7 +281,8 @@ abstract class KmsToken implements IToken
         int $issuedAtTime,
         int $expiresAtTime,
         array $customClaims,
-        string $signingKeyId
+        string $signingKeyId,
+        string $issuedBy = null
     ) {
         // Generate a new hashing secret key
         $generatedKey = $this->generateKeyData($clientAppKmsMasterKeyId);
@@ -293,7 +295,8 @@ abstract class KmsToken implements IToken
             $customClaims,
             $this->getTokenKeyHeaders($clientAppId, base64_encode($generatedKey['CiphertextBlob'])),
             $signingKeyId,
-            $generatedKey['Plaintext']
+            $generatedKey['Plaintext'],
+            $issuedBy
         );
     }
 
@@ -382,15 +385,12 @@ abstract class KmsToken implements IToken
     /**
      * Parse a JSON compact notation string and verfiy the provided signature
      *
-     * @todo Specify void return type in PHP 7.1
-     *
      * @param string $tokenString    Base64-encoded JWS token string
-     *
      * @return void
      *
-     * @throws InvalidSignatureException
+     * @throws InvalidJsonStringException
      */
-    final protected function parseBase64EncodedTokenData(string $tokenString)
+    final protected function parseBase64EncodedTokenData(string $tokenString): void
     {
         $loader = new Loader();
         try {
@@ -407,16 +407,13 @@ abstract class KmsToken implements IToken
     /**
      * Verify the signature of the token
      *
-     * @todo Specify void return type in PHP 7.1
-     *
      * @param string    $keyId      Name of signing key
      * @param string    $key        Value of signing key
-     *
      * @return void
      *
      * @throws InvalidSignatureException
      */
-    final protected function verifySignature(string $keyId, string $key)
+    final protected function verifySignature(string $keyId, string $key): void
     {
         if ($this->token !== null) {
             $jwkSet = new JWKSet();

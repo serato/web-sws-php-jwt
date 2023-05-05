@@ -39,6 +39,8 @@ interface IAccessToken extends IToken
         bool $userIsEmailVerified,
         array $scopes,
         string $refreshTokenId,
+        string $subject = null,
+        string $issuedBy = null,
         int $issuedAt = null
     ): self;
 
@@ -60,13 +62,15 @@ interface IAccessToken extends IToken
     /**
      * Create the token from a JSON string and verify the token's signature
      *
-     * @param string                    $tokenString   Base64-encoded JWS token string
-     * @param CacheItemPoolInterface    $cache         PSR-6 cache item pool
+     * @param string                    $tokenString    Base64-encoded JWS token string
+     * @param CacheItemPoolInterface    $cache          PSR-6 cache item pool used for caching token secret. Optional.
+     * @param string                    $cacheKey       Cache key. Optional.
      *
      * @throws InvalidSignatureException
      */
     public function parseTokenString(
         string $tokenString,
-        CacheItemPoolInterface $cache = null
+        CacheItemPoolInterface $cache = null,
+        string $cacheKey = null
     ): void;
 }

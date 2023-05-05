@@ -31,6 +31,8 @@ class AccessToken extends KmsToken implements IAccessToken
         bool $userIsEmailVerified,
         array $scopes,
         string $refreshTokenId,
+        string $subject = null,
+        string $issuedBy = null,
         int $issuedAt = null
     ): IAccessToken {
         if ($issuedAt === null) {
@@ -40,7 +42,7 @@ class AccessToken extends KmsToken implements IAccessToken
             $kmsMasterKeyId,
             $appId,
             $audience,
-            self::TOKEN_CLAIM_SUB,
+            $subject ?? self::TOKEN_CLAIM_SUB,
             $issuedAt,
             $issuedAt + $expirySeconds,
             [
@@ -52,7 +54,8 @@ class AccessToken extends KmsToken implements IAccessToken
                 'scopes'            => $scopes,
                 'rtid'              => $refreshTokenId
             ],
-            self::TOKEN_SIGNING_KEY_ID
+            self::TOKEN_SIGNING_KEY_ID,
+            $issuedBy
         );
         return $this;
     }
@@ -82,12 +85,14 @@ class AccessToken extends KmsToken implements IAccessToken
      */
     final public function parseTokenString(
         string $tokenString,
-        CacheItemPoolInterface $cache = null
+        CacheItemPoolInterface $cache = null,
+        string $cacheKey = null
     ): void {
         $this->parseBase64EncodedTokenDataWithKms(
             $tokenString,
             self::TOKEN_SIGNING_KEY_ID,
-            $cache
+            $cache,
+            $cacheKey
         );
     }
 }
