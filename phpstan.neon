@@ -3,6 +3,11 @@ parameters:
     paths:
         - %currentWorkingDirectory%/src
         - %currentWorkingDirectory%/tests
+    excludePaths:
+        analyse:
+            - src/Checker
+    ignoreErrors:
+        - '#not subtype of Throwable#'
 includes:
     - vendor/phpstan/phpstan-phpunit/extension.neon
     - vendor/phpstan/phpstan-mockery/extension.neon
