@@ -23,7 +23,7 @@ class TokenTest extends TestCase
      *
      * @group jwt
      */
-    public function testValidParse()
+    public function testValidParse(): void
     {
         $token = new Token();
         $token->create();
@@ -39,21 +39,21 @@ class TokenTest extends TestCase
      *
      * @group jwt
      */
-    public function testPayloadTamperNoSignatureCheck()
+    public function testPayloadTamperNoSignatureCheck(): void
     {
         $token = new Token();
         $token->create();
 
         $tokenParts = explode('.', (string)$token);
         $jsonString = base64_decode($tokenParts[1]);
-        $payload = json_decode($jsonString === false ? '' : $jsonString, true);
+        $payload = json_decode($jsonString ?: '', true);
         $payload['var1'] = 'fiddled_with';
 
         $jsonString = json_encode($payload);
         $jsonData = $tokenParts[0] . '.' .
-            Base64Url::encode($jsonString === false ? '' : $jsonString) . '.' .
+            Base64Url::encode($jsonString ?: '') . '.' .
             $tokenParts[2];
-        
+
         $newToken = new Token();
         $newToken->createFromJson($jsonData, false);
         $this->assertEquals($newToken->getClaim('var1'), 'fiddled_with');
@@ -65,7 +65,7 @@ class TokenTest extends TestCase
      * @expectedException \Serato\Jwt\Exception\InvalidSignatureException
      * @group jwt
      */
-    public function testPayloadTamperSignatureCheck()
+    public function testPayloadTamperSignatureCheck(): void
     {
         $token = new Token();
         $token->create();
@@ -73,14 +73,14 @@ class TokenTest extends TestCase
         $tokenParts = explode('.', (string)$token);
 
         $jsonString = base64_decode($tokenParts[1]);
-        $payload = json_decode($jsonString === false ? '' : $jsonString, true);
+        $payload = json_decode($jsonString ?: '', true);
         $payload['var1'] = 'fiddled_with';
 
         $jsonString = json_encode($payload);
         $jsonData = $tokenParts[0] . '.' .
-            Base64Url::encode($jsonString === false ? '' : $jsonString) . '.' .
+            Base64Url::encode($jsonString ?: '') . '.' .
             $tokenParts[2];
-        
+
         $newToken = new Token();
         $newToken->createFromJson($jsonData);
     }
@@ -91,7 +91,7 @@ class TokenTest extends TestCase
      *
      * @group jwt
      */
-    public function testCheckClaimsAllValid()
+    public function testCheckClaimsAllValid(): void
     {
         $token = new Token();
         $token->create();
@@ -106,7 +106,7 @@ class TokenTest extends TestCase
      * @expectedException \Serato\Jwt\Exception\InvalidIssuerClaimException
      * @group jwt
      */
-    public function testCheckClaimsInvalidIssuer()
+    public function testCheckClaimsInvalidIssuer(): void
     {
         $token = new Token();
         $token->create('fake issuer');
@@ -120,7 +120,7 @@ class TokenTest extends TestCase
      * @expectedException \Serato\Jwt\Exception\TokenExpiredException
      * @group jwt
      */
-    public function testCheckClaimsTokenExpired()
+    public function testCheckClaimsTokenExpired(): void
     {
         $token = new Token();
         $token->create(null, time() - (2 * 60 * 60));
@@ -134,7 +134,7 @@ class TokenTest extends TestCase
      * @expectedException \Serato\Jwt\Exception\InvalidAudienceClaimException
      * @group jwt
      */
-    public function testCheckClaimsInvalidAudience()
+    public function testCheckClaimsInvalidAudience():void
     {
         $token = new Token();
         $token->create();
@@ -148,7 +148,7 @@ class TokenTest extends TestCase
      * @expectedException \Serato\Jwt\Exception\InvalidSubjectClaimException
      * @group jwt
      */
-    public function testCheckClaimsInvalidSubject()
+    public function testCheckClaimsInvalidSubject(): void
     {
         $token = new Token();
         $token->create();
@@ -162,7 +162,7 @@ class TokenTest extends TestCase
      * @expectedException \Serato\Jwt\Exception\CriticalClaimsVerificationException
      * @group jwt
      */
-    public function testFailedCriticalClaimsHeaderCheck()
+    public function testFailedCriticalClaimsHeaderCheck(): void
     {
         $token = new Token();
         $token->create(null, null, ['iat']);
@@ -174,7 +174,7 @@ class TokenTest extends TestCase
      *
      * @group jwt
      */
-    public function testCustomProtectedHeaderValue()
+    public function testCustomProtectedHeaderValue(): void
     {
         $headers = [
             'protected_header_1' => 'value_1',
@@ -199,7 +199,7 @@ class TokenTest extends TestCase
      *
      * @group jwt
      */
-    public function testSetInvalidRefreshTokenIdCacheItem()
+    public function testSetInvalidRefreshTokenIdCacheItem(): void
     {
         $refreshTokenId = '1234';
         $ttl = 600;
@@ -218,7 +218,7 @@ class TokenTest extends TestCase
      *
      * @group jwt
      */
-    public function testGetInvalidRefreshTokenIdCacheItemWithCacheMiss()
+    public function testGetInvalidRefreshTokenIdCacheItemWithCacheMiss(): void
     {
         $refreshTokenId = '1234';
         $mockMemcached = Mockery::mock(\Memcached::class);
@@ -233,7 +233,7 @@ class TokenTest extends TestCase
      *
      * @group jwt
      */
-    public function testGetInvalidRefreshTokenIdCacheItemWithCacheHit()
+    public function testGetInvalidRefreshTokenIdCacheItemWithCacheHit(): void
     {
         // Test existing refresh token
         $refreshTokenId = '5678';

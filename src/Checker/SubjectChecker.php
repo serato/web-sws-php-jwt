@@ -7,6 +7,9 @@ use Jose\Checker\SubjectChecker as SubjectCheckerChecker;
 
 class SubjectChecker extends SubjectCheckerChecker
 {
+    /**
+     * @var string
+     */
     private $subject;
 
     public function __construct(string $subject)

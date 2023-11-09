@@ -38,7 +38,7 @@ class AccessToken extends KmsToken
      * @throws CriticalClaimsVerificationException
      * @throws UnhandledTokenCheckException
      */
-    final public function validate(string $webServiceUri, \Memcached $memcache)
+    final public function validate(string $webServiceUri, \Memcached $memcache): void
     {
         $this->checkClaims($webServiceUri, self::TOKEN_CLAIM_SUB);
         $rtid = '';
@@ -66,9 +66,9 @@ class AccessToken extends KmsToken
      * @throws InvalidSignatureException
      */
     final public function parseTokenString(
-        string $tokenString,
+        string                 $tokenString,
         CacheItemPoolInterface $cache = null
-    ) {
+    ): void {
         $this->parseBase64EncodedTokenDataWithKms(
             $tokenString,
             self::TOKEN_SIGNING_KEY_ID,

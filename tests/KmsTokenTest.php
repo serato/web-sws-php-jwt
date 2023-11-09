@@ -28,16 +28,22 @@ class KmsTokenTest extends TestCase
     const TOKEN_EMAIL_VERIFIED = true;
     const TOKEN_SCOPES = ['scope1', 'scope2'];
 
+    /**
+     * @var string
+     */
     private $fileSystemCacheDir;
+    /**
+     * @var FileSystemCachePool
+     */
     protected static $fileSystemCachePool;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fileSystemCacheDir = sys_get_temp_dir() . '/fs-cache';
         $this->deleteFileSystemCacheDir();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->deleteFileSystemCacheDir();
     }
@@ -46,7 +52,7 @@ class KmsTokenTest extends TestCase
      * Create a mock token and ensure that the claims are created correctly
      * and that the APP ID is stored in a protected header
      */
-    public function testCreateFromUserRefreshToken()
+    public function testCreateFromUserRefreshToken(): void
     {
         $token = $this->getMockKmsToken();
         $this->assertEquals(
@@ -67,7 +73,7 @@ class KmsTokenTest extends TestCase
      * Create a mock token out of an encoded string representation of the token.
      * Confirm the token is valid.
      */
-    public function testCreateFromJsonValidAudience()
+    public function testCreateFromJsonValidAudience(): void
     {
         $token = $this->getMockKmsToken();
 
@@ -97,7 +103,7 @@ class KmsTokenTest extends TestCase
      *
      * @expectedException Serato\Jwt\Exception\InvalidAudienceClaimException
      */
-    public function testCreateFromJsonInvalidAudience()
+    public function testCreateFromJsonInvalidAudience(): void
     {
         $token = $this->getMockKmsToken();
         $newToken = new KmsToken($this->getAwsSdk());
@@ -108,7 +114,7 @@ class KmsTokenTest extends TestCase
     /**
      * Test caching functionality
      */
-    public function testCreateFromJsonEncryptionKeyCache()
+    public function testCreateFromJsonEncryptionKeyCache(): void
     {
         $token = $this->getMockKmsToken();
 
@@ -125,7 +131,7 @@ class KmsTokenTest extends TestCase
             $newToken->getProtectedHeader(KmsToken::KEY_ID_HEADER_NAME)
         ];
         $cacheKey = $method->invokeArgs($newToken, $args);
-        
+
         // Ensure that the item is in the cache
         // TODO: can we test that the expiry time of the cache item matches the expiry
         //       time of the token?
@@ -170,11 +176,11 @@ class KmsTokenTest extends TestCase
     protected function getAwsSdk() : Sdk
     {
         $mock = new MockHandler();
-        
+
         // We can "hard code" the MockHandler results queue for all tests because,
         // within the tests contained within this test case, the KmsToken class
         // always makes two calls to the KMS service in the same order of execution.
-        
+
         // Result returned by KmsClient::generateDataKey
         $mock->append(
             new Result([
@@ -218,7 +224,7 @@ class KmsTokenTest extends TestCase
         return self::$fileSystemCachePool;
     }
 
-    private function deleteFileSystemCacheDir()
+    private function deleteFileSystemCacheDir(): void
     {
         if ($this->fileSystemCacheDir !== null && is_dir($this->fileSystemCacheDir)) {
             exec('rm -rf '. escapeshellarg($this->fileSystemCacheDir));
