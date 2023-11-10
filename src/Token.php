@@ -39,7 +39,7 @@ abstract class Token
      * The value of the `iat` reserved claim within the JWT token
      */
     const ISSUED_BY = 'id.serato.io';
-    
+
     /**
      * The algorithm used to generate the JWS signature
      */
@@ -104,7 +104,7 @@ abstract class Token
      * @throws CriticalClaimsVerificationException
      * @throws UnhandledTokenCheckException
      */
-    final protected function checkClaims(string $aud, string $sub)
+    final protected function checkClaims(string $aud, string $sub): void
     {
         $checkerManager = new CheckerManager();
         // `crit` header
@@ -126,11 +126,9 @@ abstract class Token
                 case 212:
                 case 213:
                     throw new TokenExpiredException;
-                    break;
                 // `aud`
                 case 22:
                     throw new InvalidAudienceClaimException;
-                    break;
                 case 32:
                     // `sub`
                     if (strpos(strtolower($e->getMessage()), 'subject')) {
@@ -206,17 +204,16 @@ abstract class Token
     /**
      * Construct a JWS token
      *
-     * @todo Specify void return type in PHP 7.1
-     *
-     * @param array     $audience           JWT `aud` claim
-     * @param string    $subject            JWT `sub` claim
-     * @param int       $issuedAtTime       JWT `iat` claim
-     * @param int       $expiresAtTime      JWT `exp` claim
-     * @param array     $customClaims       Custom JWT claims
-     * @param array     $customHeaders      Custom JWT headers
-     * @param string    $signingKeyId       Name of signing key
-     * @param string    $signingKey         Value of signing key
-     *
+     * @param array<string>         $audience           JWT `aud` claim
+     * @param string                $subject            JWT `sub` claim
+     * @param int                   $issuedAtTime       JWT `iat` claim
+     * @param int                   $expiresAtTime      JWT `exp` claim
+     * @param array<mixed>          $customClaims       Custom JWT claims
+     * @param array<mixed>          $customHeaders      Custom JWT headers
+     * @param string                $signingKeyId       Name of signing key
+     * @param string                $signingKey         Value of signing key
+     * @param string|null           $issuedBy
+     * @param array<string>|null    $crit
      * @return void
      */
     final protected function createToken(
@@ -249,7 +246,7 @@ abstract class Token
         step via a class that implements the Jose\Checker\ClaimCheckerInterface interface.
 
         The `crit` header itself is checked via the Jose\Checker\CriticalHeaderChecker class.
-        
+
         See self::checkClaims for implementation of checkers.
         */
 
@@ -295,7 +292,7 @@ abstract class Token
         string $refreshTokenId,
         int $ttl
     ): bool {
-    
+
         return $memcache->add(self::getRefreshTokenIdCacheKey($refreshTokenId), $refreshTokenId, $ttl);
     }
 
@@ -310,7 +307,7 @@ abstract class Token
         \Memcached $memcache,
         string $refreshTokenId
     ): ?string {
-    
+
         $cacheItem = $memcache->get(self::getRefreshTokenIdCacheKey($refreshTokenId));
         if ($cacheItem === false) {
             return null;

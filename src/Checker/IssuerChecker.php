@@ -7,6 +7,9 @@ use Jose\Checker\IssuerChecker as JoseIssuerChecker;
 
 class IssuerChecker extends JoseIssuerChecker
 {
+    /**
+     * @var string
+     */
     private $issuer;
 
     public function __construct(string $issuer)

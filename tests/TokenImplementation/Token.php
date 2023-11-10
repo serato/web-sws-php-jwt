@@ -7,12 +7,31 @@ use Serato\Jwt\Token as JwtToken;
 
 class Token extends JwtToken
 {
+    /**
+     * @var string[]
+     */
     protected $audience = ['audience.member'];
+    /**
+     * @var string
+     */
     protected $signer_id = 'JWS_ACCESS_COMPACT_HS512';
+    /**
+     * @var string
+     */
     protected $signer_key = 'abcdefgh';
+    /**
+     * @var string
+     */
     protected $sub = 'test subject';
 
-    public function create($issuedBy = null, int $exp = null, array $crit = null, array $headers = [])
+    /**
+     * @param string|null $issuedBy
+     * @param int|null $exp
+     * @param array<string>|null $crit
+     * @param array<mixed> $headers
+     * @return void
+     */
+    public function create(string $issuedBy = null, int $exp = null, array $crit = null, array $headers = []): void
     {
         $this->createToken(
             $this->audience,
@@ -31,7 +50,7 @@ class Token extends JwtToken
      *
      * @todo Specify void return type in PHP 7.1
      */
-    public function createFromJson(string $json, bool $verifySig = true)
+    public function createFromJson(string $json, bool $verifySig = true): void
     {
         $this->parseBase64EncodedTokenData($json);
         if ($verifySig) {
@@ -43,7 +62,7 @@ class Token extends JwtToken
      *
      * @todo Specify void return type in PHP 7.1
      */
-    public function verifyClaims(string $aud = null, string $sub = null)
+    public function verifyClaims(string $aud = null, string $sub = null): void
     {
         $this->checkClaims(
             $aud ?? $this->audience[0],

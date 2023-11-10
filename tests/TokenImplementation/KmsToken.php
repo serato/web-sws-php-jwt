@@ -14,16 +14,16 @@ class KmsToken extends JwtKmsToken
     /**
      * Create an access token
      *
-     * @param array     $audience                   JWT `aud` claim
-     * @param string    $subject                    JWT `sub` claim
-     * @param int       $issuedAtTime               JWT `iat` claim
-     * @param int       $expiresAtTime              JWT `exp` claim
-     * @param string    $clientAppKmsMasterKeyId    Client Application KMS Master Key
-     * @param string    $clientAppId                Client Application ID
-     * @param int       $userId                     User ID
-     * @param string    $userEmail                  User Email
-     * @param bool      $emailVerified              Email Verification
-     * @param array     $scopes                     An array of scopes
+     * @param array<string>  $audience                   JWT `aud` claim
+     * @param string         $subject                    JWT `sub` claim
+     * @param int            $issuedAtTime               JWT `iat` claim
+     * @param int            $expiresAtTime              JWT `exp` claim
+     * @param string         $clientAppKmsMasterKeyId    Client Application KMS Master Key
+     * @param string         $clientAppId                Client Application ID
+     * @param int            $userId                     User ID
+     * @param string         $userEmail                  User Email
+     * @param bool           $emailVerified              Email Verification
+     * @param array<string>  $scopes                     An array of scopes
      *
      * @return KmsToken
      */
@@ -63,15 +63,15 @@ class KmsToken extends JwtKmsToken
         return $this;
     }
 
-    public function validate(string $audience, string $subject)
+    public function validate(string $audience, string $subject): void
     {
         $this->checkClaims($audience, $subject);
     }
 
     public function parseTokenString(
-        string $tokenString,
+        string                 $tokenString,
         CacheItemPoolInterface $cache = null
-    ) {
+    ): void {
         $this->parseBase64EncodedTokenDataWithKms(
             $tokenString,
             self::TOKEN_SIGNING_KEY_ID,
