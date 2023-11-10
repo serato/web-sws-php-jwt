@@ -204,16 +204,16 @@ abstract class Token
     /**
      * Construct a JWS token
      *
-     * @param array<string> $audience JWT `aud` claim
-     * @param string $subject JWT `sub` claim
-     * @param int $issuedAtTime JWT `iat` claim
-     * @param int $expiresAtTime JWT `exp` claim
-     * @param array<mixed> $customClaims Custom JWT claims
-     * @param array<mixed> $customHeaders Custom JWT headers
-     * @param string $signingKeyId Name of signing key
-     * @param string $signingKey Value of signing key
-     * @param string|null $issuedBy
-     * @param array<string>|null $crit
+     * @param array<string>         $audience           JWT `aud` claim
+     * @param string                $subject            JWT `sub` claim
+     * @param int                   $issuedAtTime       JWT `iat` claim
+     * @param int                   $expiresAtTime      JWT `exp` claim
+     * @param array<mixed>          $customClaims       Custom JWT claims
+     * @param array<mixed>          $customHeaders      Custom JWT headers
+     * @param string                $signingKeyId       Name of signing key
+     * @param string                $signingKey         Value of signing key
+     * @param string|null           $issuedBy
+     * @param array<string>|null    $crit
      * @return void
      */
     final protected function createToken(
